@@ -899,4 +899,37 @@ class OnlineShopTest extends TestCase
         $this->artisan('openshop:mail-test')->assertExitCode(1);
     }
 
+
+    public function test_email_html_template_renders_actual_order_contents(): void
+    {
+        $buyer = User::factory()->create(['role' => 'customer']);
+        $order = Order::create([
+            'user_id' => $buyer->id,
+            'recipient_name' => 'Khách nhận hàng',
+            'phone' => '0901234567',
+            'address' => 'Địa chỉ giao hàng',
+            'total_amount' => 500000,
+            'status' => 'pending',
+        ]);
+        $order->items()->create([
+            'product_name' => 'Bàn phím cơ kiểm thử',
+            'price' => 250000,
+            'quantity' => 2,
+            'subtotal' => 500000,
+        ]);
+
+        $confirmation = new OrderUpdateMail($order);
+        $html = $confirmation->render();
+        $this->assertStringContainsString('Đặt hàng thành công', $html);
+        $this->assertStringContainsString('Bàn phím cơ kiểm thử', $html);
+        $this->assertStringContainsString($order->code, $html);
+        $this->assertStringContainsString('500.000', $html);
+        $this->assertSame('emails.order-update-text', $confirmation->content()->text);
+
+        $order->update(['status' => 'confirmed']);
+        $statusMail = new OrderUpdateMail($order->fresh(), 'pending');
+        $this->assertStringContainsString('Cập nhật trạng thái', $statusMail->render());
+        $this->assertStringContainsString('Đã xác nhận', $statusMail->render());
+    }
+
 }
