@@ -37,10 +37,40 @@ class TestShopMail extends Command
 
             return self::SUCCESS;
         } catch (Throwable $exception) {
-            $this->error('Không gửi được email. Hãy kiểm tra MAIL_HOST, MAIL_USERNAME, MAIL_PASSWORD và kết nối SMTP.');
+            $this->error('Gmail SMTP chưa chấp nhận email.');
             $this->line('Loại lỗi: ' . $exception::class);
-            // Do not output exception details that may contain SMTP credentials.
+            $this->showSafeDiagnosis($exception);
+
             return self::FAILURE;
         }
     }
+
+    /**
+     * Only reveal a safe error category. Full SMTP exception/debug output
+     * can contain server responses and authentication data; never print it.
+     */
+    private function showSafeDiagnosis(Throwable $error): void
+    {
+        $message = '';
+        $current = $error;
+        for ($i = 0; $i < 6 && $current !== null; $i++) {
+            $message .= ' ' . strtolower($current->getMessage());
+            $current = $current->getPrevious();
+        }
+
+        if (preg_match('/certificate|verify failed|unable to get local issuer|self.signed|peer certificate|openssl|ssl operation failed/u', $message)) {
+            $this->warn('Chan doan: PHP khong xac thuc duoc chung chi TLS/SSL. Kiem tra openssl.cafile trong php.ini va CA bundle tin cay.');
+        } elseif (preg_match('/535|534|5[.]7[.]8|authentication|authenticate|authenticator|invalid credentials|password not accepted/u', $message)) {
+            $this->warn('Chan doan: Gmail tu choi xac thuc SMTP. Kiem tra dung App Password 16 ky tu, Gmail cua ung dung va Xac minh 2 buoc.');
+        } elseif (preg_match('/starttls|tls handshake|tls connection|unable to connect with tls/u', $message)) {
+            $this->warn('Chan doan: STARTTLS gap loi. Kiem tra TLS, chung chi may chu va MAIL_SCHEME=smtp voi MAIL_PORT=587.');
+        } elseif (preg_match('/timed out|timeout|connection refused|network is unreachable|getaddrinfo|could not connect|connection could not be established/u', $message)) {
+            $this->warn('Chan doan: Khong ket noi on dinh den SMTP. Thu Test-NetConnection smtp.gmail.com -Port 587.');
+        } else {
+            $this->warn('Chan doan: Chua xac dinh. Vui long kiem tra php --ini, openssl.cafile va trang thai bao ve tai khoan Google.');
+        }
+
+        $this->line('Chi hien phan loai loi; KHONG in mat khau ung dung hoac phan hoi SMTP chi tiet.');
+    }
+
 }

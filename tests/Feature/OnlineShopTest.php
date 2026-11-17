@@ -932,4 +932,33 @@ class OnlineShopTest extends TestCase
         $this->assertStringContainsString('Đã xác nhận', $statusMail->render());
     }
 
+
+    public function test_mail_diagnostics_classifies_gmail_auth_error_without_leaking_credentials(): void
+    {
+        config(['mail.default' => 'smtp']);
+        \Illuminate\Support\Facades\Mail::shouldReceive('raw')->once()->andThrow(
+            new \Symfony\Component\Mailer\Exception\TransportException(
+                'Failed to authenticate 535 - sensitive-test-secret-is-not-real'
+            )
+        );
+
+        $this->artisan('openshop:mail-test')
+            ->expectsOutputToContain('Gmail tu choi xac thuc SMTP')
+            ->assertExitCode(1);
+    }
+
+    public function test_mail_diagnostics_classifies_tls_certificate_error(): void
+    {
+        config(['mail.default' => 'smtp']);
+        \Illuminate\Support\Facades\Mail::shouldReceive('raw')->once()->andThrow(
+            new \Symfony\Component\Mailer\Exception\TransportException(
+                'stream_socket_enable_crypto(): certificate verify failed'
+            )
+        );
+
+        $this->artisan('openshop:mail-test')
+            ->expectsOutputToContain('chung chi TLS/SSL')
+            ->assertExitCode(1);
+    }
+
 }
