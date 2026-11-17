@@ -1,20 +1,26 @@
 @props(['product'])
 @php
-    $symbol = match($product->category?->slug) {
-        'ban-phim' => '⌨️',
-        'chuot-may-tinh' => '🖱️',
-        'am-thanh' => '🎧',
-        default => '💻',
-    };
+    $categoryIcons = [
+        'dien-thoai' => 'smartphone',
+        'laptop' => 'laptop',
+        'may-tinh-bang' => 'tablet',
+        'dong-ho-thong-minh' => 'watch',
+        'am-thanh' => 'headphones',
+        'may-choi-game' => 'gamepad',
+        'ban-phim' => 'keyboard',
+        'chuot-may-tinh' => 'mouse',
+        'phu-kien' => 'cable',
+    ];
+    $isDemoPhoto = $product->image_url && str_contains($product->image_url, '/images/real-products/');
 @endphp
 <div {{ $attributes->class(['product-art']) }}>
     @if($product->image_url)
-        <img src="{{ $product->image_url }}" alt="Ảnh chụp tham khảo: {{ $product->name }}" loading="lazy" referrerpolicy="no-referrer">
-        @if(!$product->image_path && \App\Support\RealProductPhotos::forSlug($product->slug))
+        <img src="{{ $product->image_url }}" alt="Ảnh chụp tham khảo: {{ $product->name }}" loading="lazy" decoding="async" referrerpolicy="no-referrer">
+        @if($isDemoPhoto)
             <span class="photo-ref-label">Ảnh chụp tham khảo</span>
         @endif
     @else
-        <span aria-hidden="true" class="product-art-icon">{{ $symbol }}</span>
-        <span class="product-art-label">OPENSHOP / TECH</span>
+        <span class="product-art-icon"><x-ui-icon :name="$categoryIcons[$product->category?->slug] ?? 'package'" :size="68" :stroke="1.15"/></span>
+        <span class="product-art-label">Chưa có hình ảnh</span>
     @endif
 </div>
