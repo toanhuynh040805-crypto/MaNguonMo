@@ -588,7 +588,9 @@ class OnlineShopTest extends TestCase
             $this->assertNotNull($photo);
             $this->assertStringStartsWith('https://commons.wikimedia.org/wiki/File:', $photo['source_url']);
             $this->assertStringStartsWith('https://creativecommons.org/', $photo['license_url']);
+            $this->assertFileExists(public_path('images/real-products/' . $slug . '.webp'));
         }
+        $this->assertFileExists(public_path('images/real-products/hero-tech.webp'));
     }
 
     public function test_seeded_product_shows_real_photograph_url_without_changing_database(): void
@@ -616,6 +618,8 @@ class OnlineShopTest extends TestCase
 
     public function test_uploaded_product_image_has_priority_over_demo_artwork(): void
     {
+        Storage::fake('public');
+        Storage::disk('public')->put('products/custom-image.jpg', 'photo');
         $category = Category::create(['name' => 'Bàn phím', 'slug' => 'ban-phim']);
         $product = Product::create([
             'category_id' => $category->id,
@@ -631,6 +635,77 @@ class OnlineShopTest extends TestCase
             '/storage/products/custom-image.jpg', $product->image_url
         );
         $this->assertStringNotContainsString('Special:Redirect', $product->image_url);
+    }
+
+
+    public function test_missing_uploaded_image_uses_local_photo_instead_of_broken_url(): void
+    {
+        Storage::fake('public');
+        $category = Category::create(['name' => 'Bàn phím', 'slug' => 'ban-phim']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Bàn phím cơ Mini 68',
+            'slug' => 'ban-phim-co-mini-68',
+            'price' => 790000,
+            'stock' => 10,
+            'image_path' => 'products/missing-upload.jpg',
+            'is_active' => true,
+        ]);
+
+        $this->assertStringContainsString(
+            '/images/real-products/ban-phim-co-mini-68.webp',
+            $product->image_url
+        );
+    }
+
+    public function test_admin_can_remove_uploaded_photo_and_restore_builtin_photo(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('products/custom-photo.jpg', 'uploaded-photo');
+        $category = Category::create(['name' => 'Bàn phím', 'slug' => 'ban-phim']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Bàn phím cơ Mini 68',
+            'slug' => 'ban-phim-co-mini-68',
+            'price' => 790000,
+            'stock' => 10,
+            'image_path' => 'products/custom-photo.jpg',
+            'is_active' => true,
+        ]);
+
+        $this->actingAs(User::factory()->create(['role' => 'admin']))
+            ->put(route('admin.products.update', $product), [
+                'name' => $product->name,
+                'category_id' => $category->id,
+                'price' => $product->price,
+                'stock' => $product->stock,
+                'is_active' => 1,
+                'remove_image' => 1,
+            ])
+            ->assertRedirect(route('admin.products.index'));
+
+        $this->assertNull($product->fresh()->image_path);
+        Storage::disk('public')->assertMissing('products/custom-photo.jpg');
+        $this->assertStringContainsString(
+            '/images/real-products/ban-phim-co-mini-68.webp',
+            $product->fresh()->image_url
+        );
+    }
+
+    public function test_unknown_product_does_not_use_unattributed_photo_or_external_url(): void
+    {
+        $category = Category::create(['name' => 'Mẫu mới', 'slug' => 'mau-moi']);
+        $product = Product::create([
+            'category_id' => $category->id,
+            'name' => 'Sản phẩm mới',
+            'slug' => 'san-pham-moi',
+            'price' => 200000,
+            'stock' => 1,
+            'is_active' => true,
+        ]);
+
+        $this->assertNull($product->image_url);
+        $this->assertNull(\App\Support\RealProductPhotos::localUrl('../secret'));
     }
 
 }

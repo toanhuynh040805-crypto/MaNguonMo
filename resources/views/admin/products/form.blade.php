@@ -11,7 +11,19 @@
         <div class="col-12"><label for="description" class="form-label fw-semibold">Mô tả</label><textarea id="description" name="description" rows="4" maxlength="3000" class="form-control">{{ old('description', $product->description) }}</textarea></div>
         <div class="col-md-8"><label for="image" class="form-label fw-semibold">Ảnh sản phẩm (tùy chọn)</label><input id="image" type="file" name="image" accept="image/jpeg,image/png,image/webp" class="form-control"><div class="form-text">JPG/PNG/WebP, tối đa 2 MB. Chạy php artisan storage:link để hiện ảnh.</div></div>
         <div class="col-md-4 d-flex align-items-center"><div><input type="hidden" name="is_active" value="0"><input type="checkbox" name="is_active" id="is_active" value="1" class="form-check-input" @checked(old('is_active', $product->is_active))><label for="is_active" class="form-check-label ms-2">Hiển thị để bán</label></div></div>
-        @if($product->image_url)<div class="col-12"><img src="{{ $product->image_url }}" alt="Ảnh hiện tại" style="height:100px;max-width:200px;object-fit:contain" class="rounded-3 border p-2"></div>@endif
+        @if($product->image_url)
+            <div class="col-12">
+                <div class="small fw-semibold mb-2">{{ $product->image_path ? 'Ảnh hiện tại (ưu tiên ảnh do Admin tải lên)' : 'Ảnh chụp thật từ thư mục mẫu' }}</div>
+                <img src="{{ $product->image_url }}" alt="Ảnh đang hiển thị của {{ $product->name }}" style="height:120px;max-width:240px;object-fit:contain" class="rounded-3 border p-2">
+                @if($product->image_path)
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" name="remove_image" value="1" id="remove_image">
+                        <label class="form-check-label" for="remove_image">Xóa ảnh đã tải lên, dùng lại ảnh chụp mẫu nếu có</label>
+                    </div>
+                @endif
+                <p class="form-text mb-0">Ảnh mẫu lưu trong public/images/real-products/. Ảnh do Admin tải lên lưu trong storage/app/public/products/.</p>
+            </div>
+        @endif
     </div>
     <div class="d-flex gap-2 mt-4"><button class="btn btn-primary px-4">{{ $product->exists ? 'Lưu thay đổi' : 'Thêm sản phẩm' }}</button><a href="{{ route('admin.products.index') }}" class="btn btn-outline-secondary">Hủy</a></div>
 </form></div>

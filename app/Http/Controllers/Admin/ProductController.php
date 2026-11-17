@@ -63,13 +63,24 @@ class ProductController extends Controller
     public function update(Request $request, Product $product): RedirectResponse
     {
         $data = $this->validatedData($request, $product);
-        if ($request->hasFile('image')) {
+        $oldImage = $product->image_path;
+        $replaceImage = $request->hasFile('image');
+        $removeImage = $request->boolean('remove_image') && ! $replaceImage;
+
+        if ($replaceImage) {
             $data['image_path'] = $request->file('image')->store('products', 'public');
-            if ($product->image_path) {
-                Storage::disk('public')->delete($product->image_path);
-            }
+        } elseif ($removeImage) {
+            // Restore the original photo bundled with the source repository.
+            $data['image_path'] = null;
         }
+
         $product->update($data);
+
+        // Delete old uploads only after successfully updating the product.
+        if (($replaceImage || $removeImage) && $oldImage) {
+            Storage::disk('public')->delete($oldImage);
+        }
+
         return redirect()->route('admin.products.index')->with('success', 'Đã cập nhật sản phẩm.');
     }
 
@@ -99,9 +110,10 @@ class ProductController extends Controller
             'price' => ['required', 'integer', 'min:1000', 'max:999999999'],
             'stock' => ['required', 'integer', 'min:0', 'max:1000000'],
             'image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'remove_image' => ['sometimes', 'boolean'],
             'is_active' => ['required', 'boolean'],
         ]);
-        unset($data['image']);
+        unset($data['image'], $data['remove_image']);
         $data['slug'] = Str::slug($data['name']);
         if ($data['slug'] === '' || Product::where('slug', $data['slug'])
             ->when($product, fn ($q) => $q->whereKeyNot($product->id))->exists()) {

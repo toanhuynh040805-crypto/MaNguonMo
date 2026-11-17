@@ -30,21 +30,15 @@ class Product extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        // An uploaded product photo always takes precedence over the bundled
-        // demo illustration. Do not overwrite saved local images on upgrade.
-        if ($this->image_path) {
+        // Uploaded photos live in storage/app/public/products and take priority
+        // when the file still exists. A missing upload falls back to local artwork
+        // rather than leaving the page with a broken image.
+        if ($this->image_path && Storage::disk('public')->exists($this->image_path)) {
             return Storage::disk('public')->url($this->image_path);
         }
 
-        // Real photos are actual Wikimedia Commons photographs, not AI illustrations.
-        // Local optimized images (if downloaded) take priority over remote URLs.
-        $slug = $this->slug;
-        $photo = \App\Support\RealProductPhotos::forSlug($slug);
-        if ($photo) {
-            return \App\Support\RealProductPhotos::localUrl($slug)
-                ?? \App\Support\RealProductPhotos::remoteUrl($photo);
-        }
-
-        return null;
+        // Seeded demo photos are committed in public/images/real-products.
+        // Never depend on Wikimedia being online to display product pictures.
+        return \App\Support\RealProductPhotos::localUrl((string) $this->slug);
     }
 }

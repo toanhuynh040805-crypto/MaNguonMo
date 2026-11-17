@@ -6,11 +6,37 @@
 
 - **15 sản phẩm mẫu** được liên kết với 15 ảnh chụp thiết bị thật trên Wikimedia Commons có giấy phép mở. Danh sách tác giả/giấy phép: `resources/data/real_product_photos.json` và trang `/nguon-anh`.
 - Ảnh chụp là của những thiết bị **cùng loại** (ví dụ ảnh SSD dung lượng khác), không đại diện đúng model/thông số. Giữ rõ ghi chú `Ảnh chụp tham khảo` trên sản phẩm; ảnh nguồn thuộc giấy phép CC riêng của từng tác giả.
-- Ảnh được phục vụ từ `public/images/real-products/<slug>.webp` nếu đã có file tải về. Khi chưa có file local, website dùng ảnh thật qua URL Wikimedia Commons (cần internet). Tập tin downloader `scripts/download_real_product_photos.py` có thể tải 15 ảnh thật và chuyển về WebP. Không cần chạy lại Seeder hoặc tạo database.
-- Admin có thể thay ảnh bằng ảnh đúng mặt hàng tại **Admin → Sản phẩm → Sửa → Tải ảnh**. Ảnh upload lưu trong `storage/app/public/products/`, được ưu tiên hơn ảnh tham khảo và không tự push GitHub.
+- Ảnh được phục vụ **trực tiếp từ thư mục riêng** `public/images/real-products/<slug>.webp`. Toàn bộ 16 ảnh WebP đã có trong Git nên website hiện ảnh ngay sau `git pull`, kể cả khi không có Internet. Không cần chạy lại Seeder hoặc tạo database.
+- Admin có thể thay ảnh bằng ảnh đúng mặt hàng tại **Admin → Sản phẩm → Sửa → Tải ảnh**. Ảnh upload lưu trong `storage/app/public/products/`, được ưu tiên nếu tệp còn tồn tại và không tự push GitHub. Nếu ảnh upload bị mất, website tự dùng lại ảnh mẫu; Admin có thể chọn **Xóa ảnh đã tải lên** để quay về ảnh mẫu.
 - Sản phẩm mới do Admin tạo mà chưa upload ảnh vẫn hiển thị biểu tượng danh mục. **Ghi nguồn rõ ràng:** mỗi ảnh trong manifest có tác giả, liên kết gốc và đường dẫn giấy phép.
 
 - **Banner trang chủ** sử dụng ảnh chụp góc chơi game thật của Brian Wong (CC BY-SA 2.0), được lưu ở `public/images/real-products/hero-tech.webp`; nguồn ghi tại `/nguon-anh`.
+
+
+## Cấu trúc thư mục ảnh và cách hoạt động
+
+\`\`\`text
+public/
+  images/
+    real-products/             # 15 ảnh chụp sản phẩm thật + banner
+      ban-phim-co-mini-68.webp
+      chuot-gaming-6-nut.webp
+      hero-tech.webp
+      ...
+storage/
+  app/
+    public/
+      products/                 # Ảnh do Admin tải lên (không đưa vào Git)
+resources/
+  data/
+    real_product_photos.json    # Danh sách slug, tác giả và giấy phép ảnh
+\`\`\`
+
+**Quy trình Laravel:** View sử dụng \`<x-product-art :product="$product" />\`; component lấy \`$product->image_url\` từ \`app/Models/Product.php\`. Laravel ưu tiên ảnh Admin đã upload (nếu tệp tồn tại), sau đó lấy ảnh WebP từ thư mục \`public/images/real-products\` theo slug. Nếu không có ảnh, giao diện hiển thị biểu tượng mặc định. Tên file, đường dẫn và nội dung của ảnh mẫu không được lưu thành dữ liệu nhị phân trong MySQL.
+
+**Xem ảnh trực tiếp:** mở \`http://127.0.0.1:8000/images/real-products/ban-phim-co-mini-68.webp\` khi server đang chạy. Để hiển thị ảnh do Admin upload, chạy \`php artisan storage:link\` một lần.
+
+**Cập nhật:** \`git pull origin main\` sẽ tải 16 ảnh mẫu có trong Git. Ảnh Admin upload trên máy vẫn giữ nguyên; \`git pull\` không cập nhật hay xóa chúng. Không chạy \`php artisan migrate:fresh\`.
 
 ## Chức năng
 
