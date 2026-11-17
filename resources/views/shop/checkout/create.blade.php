@@ -9,6 +9,7 @@
         <div class="mb-3"><label class="form-label" for="address">Địa chỉ giao hàng *</label><textarea id="address" class="form-control" name="address" rows="3" maxlength="500" required>{{ old('address') }}</textarea></div>
         <div class="mb-3"><label class="form-label" for="note">Ghi chú (không bắt buộc)</label><textarea id="note" class="form-control" name="note" rows="3" maxlength="1000">{{ old('note') }}</textarea></div>
         <div class="rounded-4 bg-light p-3"><strong>💵 Thanh toán khi nhận hàng (COD)</strong><div class="small text-muted mt-1">Đây là website demo: không thu tiền trực tuyến.</div></div>
+        <div class="small text-muted mt-3">Thông báo đặt hàng và cập nhật trạng thái sẽ gửi đến email tài khoản: <strong>{{ auth()->user()->email }}</strong>. Bạn có thể sửa email trong mục Tài khoản trước khi đặt hàng.</div>
     </div></div>
     <div class="col-lg-5"><div class="panel p-4 sticky-summary"><h2 class="h5 fw-bold mb-3">Đơn hàng của bạn</h2>
         @foreach($items as $item)

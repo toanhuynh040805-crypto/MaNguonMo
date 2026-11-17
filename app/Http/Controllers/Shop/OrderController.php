@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Services\OrderEmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -73,7 +74,17 @@ class OrderController extends Controller
             return true;
         }, 3);
 
-        return redirect()->route('orders.show', $order)
-            ->with($cancelled ? 'success' : 'error', $cancelled ? 'Đã hủy đơn hàng và hoàn lại tồn kho.' : 'Chỉ hủy được đơn đang chờ xác nhận.');
+        if ($cancelled) {
+            // Notify only once, after the cancellation and stock restore commit.
+            $emailAccepted = app(OrderEmailService::class)->send($order->fresh(), 'pending');
+
+            return redirect()->route('orders.show', $order)->with(
+                'success',
+                'Đã hủy đơn hàng và hoàn lại tồn kho.' .
+                    ($emailAccepted ? ' Đã xử lý thông báo email.' : ' Chưa gửi được email hủy đơn.')
+            );
+        }
+
+        return redirect()->route('orders.show', $order)->with('error', 'Chỉ hủy được đơn đang chờ xác nhận.');
     }
 }

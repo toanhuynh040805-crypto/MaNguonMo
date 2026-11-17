@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\OrderEmailService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -94,6 +95,14 @@ class CheckoutController extends Controller
         }, 3);
 
         $request->session()->forget('cart');
-        return redirect()->route('orders.show', $order)->with('success', 'Đặt hàng thành công! Thanh toán khi nhận hàng (COD).');
+
+        // Commit order + stock first; email failure cannot roll back checkout.
+        $emailAccepted = app(OrderEmailService::class)->send($order);
+
+        return redirect()->route('orders.show', $order)->with(
+            'success',
+            'Đặt hàng thành công! Thanh toán khi nhận hàng (COD).' .
+                ($emailAccepted ? ' Đã xử lý thông báo email.' : ' Chưa gửi được email; đơn hàng vẫn được lưu.')
+        );
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Services\OrderEmailService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -69,10 +70,10 @@ class OrderController extends Controller
     {
         $data = $request->validate(['status' => ['required', 'in:confirmed,shipping,completed,cancelled']]);
 
-        $updated = DB::transaction(function () use ($order, $data, $request): bool {
+        $previousStatus = DB::transaction(function () use ($order, $data, $request): ?string {
             $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
             if (! in_array($data['status'], Order::TRANSITIONS[$locked->status] ?? [], true)) {
-                return false;
+                return null;
             }
             $oldStatus = $locked->status;
             $locked->update([
@@ -91,10 +92,21 @@ class OrderController extends Controller
                     }
                 }
             }
-            return true;
+            return $oldStatus;
         }, 3);
 
-        return back()->with($updated ? 'success' : 'error', $updated ? 'Đã cập nhật trạng thái đơn hàng.' : 'Không thể chuyển sang trạng thái này.');
+        if ($previousStatus === null) {
+            return back()->with('error', 'Không thể chuyển sang trạng thái này.');
+        }
+
+        // Send after transaction commit only when a real status transition happened.
+        $emailAccepted = app(OrderEmailService::class)->send($order->fresh(), $previousStatus);
+
+        return back()->with(
+            'success',
+            'Đã cập nhật trạng thái đơn hàng.' .
+                ($emailAccepted ? ' Đã xử lý thông báo email.' : ' Chưa gửi được email; hãy kiểm tra cấu hình mail.')
+        );
     }
 
     /** Shared filtering makes exported rows match the list shown on screen. */
