@@ -148,5 +148,175 @@
     "license_url": "https://creativecommons.org/licenses/by/2.0/",
     "source_url": "https://commons.wikimedia.org/wiki/File:SanDisk_Extreme_Portable_SSD_-_1TB%2C_USB-C_(41036158305).jpg",
     "notice": "Ảnh chụp sản phẩm cùng loại để minh họa; không khẳng định đúng thương hiệu, mẫu hoặc thông số."
+  },
+  {
+    "slug": "iphone-16-pro-128gb",
+    "product": "iPhone 16 Pro 128GB",
+    "file": "IPhone 16 Pro series.jpg",
+    "author": "Jakub CA",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:IPhone_16_Pro_series.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "iphone-15-128gb",
+    "product": "iPhone 15 128GB",
+    "file": "IPhone 15.jpg",
+    "author": "Kyu3",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:IPhone_15.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "samsung-galaxy-s25-ultra-256gb",
+    "product": "Samsung Galaxy S25 Ultra 256GB",
+    "file": "Samsung Galaxy S25 Ultra 2025.jpg",
+    "author": "Captainmorlypogi1959",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_S25_Ultra_2025.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "samsung-galaxy-s24-256gb",
+    "product": "Samsung Galaxy S24 256GB",
+    "file": "Samsung Galaxy S24.jpg",
+    "author": "Vis M",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Samsung_Galaxy_S24.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "google-pixel-9-pro-xl-128gb",
+    "product": "Google Pixel 9 Pro XL 128GB",
+    "file": "Pixel 9 Pro XL.jpg",
+    "author": "Miyako Fujimiya",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pixel_9_Pro_XL.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "samsung-galaxy-z-fold6-256gb",
+    "product": "Samsung Galaxy Z Fold6 256GB",
+    "file": "20240914 삼성 갤럭시 Z 폴드6 펼쳤을때.jpg",
+    "author": "Striker9498",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:20240914_%EC%82%BC%EC%84%B1_%EA%B0%A4%EB%9F%AD%EC%8B%9C_Z_%ED%8F%B4%EB%93%9C6_%ED%8E%BC%EC%B3%A4%EC%9D%84%EB%95%8C.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "macbook-air-13-m4-16gb-256gb",
+    "product": "MacBook Air 13 M4 16GB/256GB",
+    "file": "MacBook Air (13-inch, M4, Silver).jpg",
+    "author": "AzureSaturn",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:MacBook_Air_(13-inch%2C_M4%2C_Silver).jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "macbook-air-15-m4-16gb-256gb",
+    "product": "MacBook Air 15 M4 16GB/256GB",
+    "file": "MacBook Air (15-inch, M4, Silver).jpg",
+    "author": "AzureSaturn",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:MacBook_Air_(15-inch%2C_M4%2C_Silver).jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "microsoft-surface-laptop-7-13-8-inch",
+    "product": "Microsoft Surface Laptop 7 13.8 inch",
+    "file": "Microsoft Surface Laptop 7.jpg",
+    "author": "StrangeApparition2011",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Microsoft_Surface_Laptop_7.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "ipad-air-13-m2-wifi-128gb",
+    "product": "iPad Air 13 M2 Wifi 128GB",
+    "file": "About iPad Air 13-inch (M2).jpg",
+    "author": "メイド理世",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:About_iPad_Air_13-inch_(M2).jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "ipad-gen-10-wifi-64gb",
+    "product": "iPad Gen 10 Wifi 64GB",
+    "file": "Ipadtenthgen.jpg",
+    "author": "Wiikiipediia",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ipadtenthgen.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "samsung-galaxy-tab-s9-128gb",
+    "product": "Samsung Galaxy Tab S9 128GB",
+    "file": "20230729 삼성 갤럭시 탭 S9.jpg",
+    "author": "Striker9498",
+    "license": "CC BY-SA 3.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:20230729_%EC%82%BC%EC%84%B1_%EA%B0%A4%EB%9F%AD%EC%8B%9C_%ED%83%AD_S9.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "apple-watch-series-10-gps",
+    "product": "Apple Watch Series 10 GPS",
+    "file": "Apple Watch S10. (54037613714).jpg",
+    "author": "MIKI Yoshihito",
+    "license": "CC BY 2.0",
+    "license_url": "https://creativecommons.org/licenses/by/2.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Apple_Watch_S10._(54037613714).jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "samsung-galaxy-watch7",
+    "product": "Samsung Galaxy Watch7",
+    "file": "Galaxy Watch 7.jpg",
+    "author": "Kyu3a",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Galaxy_Watch_7.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "apple-airpods-4",
+    "product": "Apple AirPods 4",
+    "file": "Airpods 4.jpg",
+    "author": "AppleFans 1",
+    "license": "CC0 1.0",
+    "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Airpods_4.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "apple-airpods-pro-2",
+    "product": "Apple AirPods Pro 2",
+    "file": "AirPods 4 and AirPods Pro 2.jpg",
+    "author": "茅野ふたば",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:AirPods_4_and_AirPods_Pro_2.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
+  },
+  {
+    "slug": "nintendo-switch-oled",
+    "product": "Nintendo Switch OLED",
+    "file": "Switch OLED Model.jpg",
+    "author": "KK IN HK",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Switch_OLED_Model.jpg",
+    "notice": "Ảnh chụp thiết bị cùng model/dòng máy; dung lượng và màu sắc có thể khác biến thể demo. Ảnh được thu nhỏ và chuyển WebP."
   }
 ]

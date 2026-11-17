@@ -83,8 +83,8 @@ def process(photo):
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     photos = json.loads(CATALOG.read_text(encoding="utf-8"))
-    if len(photos) != 15:
-        raise ValueError("Expected 15 catalog photographs")
+    if len(photos) < 15:
+        raise ValueError("Photo catalog is unexpectedly incomplete")
     for p in photos:
         process(p)
 
@@ -93,7 +93,7 @@ def main():
         "slug": "hero-tech",
         "file": "Gaming PC-Setup - Astaroth- The Completed System.jpg",
     })
-    print("DONE: 15 real product photos and one real desk setup photo", flush=True)
+    print(f"DONE: {len(photos)} real product photos and one real desk setup photo", flush=True)
 
 
 if __name__ == "__main__":

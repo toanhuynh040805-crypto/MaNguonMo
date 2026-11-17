@@ -60,6 +60,9 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        // Only add missing new products; retain existing orders and Admin edits.
+        $this->call(ModernCatalogSeeder::class);
+
         // Set both variables in .env for a LOCAL DEMO only; no hard-coded default credentials.
         $email = env('SEED_ADMIN_EMAIL');
         $password = env('SEED_ADMIN_PASSWORD');
