@@ -45,6 +45,15 @@
 | TC38 | Dashboard | Chuyển đơn thành hoàn tất | Ghi completed_at, doanh thu theo tháng hoàn tất | Chưa kiểm thử |
 | TC39 | Seeder | Chạy db:seed khi Admin đã tồn tại | Không đặt lại mật khẩu Admin | Chưa kiểm thử |
 
+| TC40 | Email đặt hàng | Customer đặt đơn thành công | Gửi đúng một email đến địa chỉ Customer, chứa mã đơn và COD | Kiểm thử tự động |
+| TC41 | Email trạng thái | Admin xác nhận → đang giao → hoàn tất | Mỗi lần chuyển trạng thái hợp lệ gửi một email | Kiểm thử tự động |
+| TC42 | Email hủy đơn | Admin hủy đơn pending | Có mail hủy; từ chối chuyển trạng thái sai không gửi mail | Kiểm thử tự động |
+| TC43 | Email hủy đơn | Customer hủy pending hai lần | Chỉ một email hủy, hoàn tồn kho đúng một lần | Kiểm thử tự động |
+| TC44 | Email lỗi SMTP | Mô phỏng máy chủ SMTP không phản hồi | Đơn vẫn lưu, tồn kho được trừ, giao diện hiển thị email chưa gửi | Kiểm thử tự động |
+| TC45 | Email không hợp lệ | Tài khoản có email sai định dạng | Không gửi email không hợp lệ | Kiểm thử tự động |
+| TC46 | Lệnh test mail | Chạy lệnh khi MAIL_MAILER=array | Không báo gửi Gmail, trả mã lỗi | Kiểm thử tự động |
+| TC47 | Gmail thực tế | Cấu hình App Password rồi chạy openshop:mail-test | Thư gửi thử vào Inbox/Spam | Cần kiểm tra thủ công |
+
 ## Kịch bản demo đề xuất (7–10 phút)
 
 1. Mở trang khách vãng lai, tìm kiếm/lọc sản phẩm.

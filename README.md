@@ -58,6 +58,40 @@ php artisan serve
 
 Không chạy \`php artisan migrate:fresh\`. Chụp lại hình giao diện khi 32 sản phẩm đã xuất hiện và kiểm tra nhập vai Customer/Admin trước khi nộp.
 
+## Email tự động khi đặt hàng và thay đổi trạng thái
+
+OpenShop dùng **toantoan482005@gmail.com** làm địa chỉ gửi và dùng **email tài khoản Customer đăng nhập** làm người nhận. Email chứa mã đơn, chi tiết sản phẩm, số lượng, tổng tiền COD, người nhận và trạng thái đơn hàng. Hệ thống gửi thông báo trong các trường hợp: đặt hàng thành công, Admin xác nhận, bắt đầu giao hàng, hoàn tất và Admin hoặc khách hủy đơn. Không gửi thông báo nếu chuyển trạng thái bị từ chối.
+
+**Cấu hình Gmail trên máy của bạn (không đưa mật khẩu lên GitHub):**
+
+1. Mở https://myaccount.google.com/apppasswords và đăng nhập Gmail của cửa hàng. Bật Xác minh hai bước (2-Step Verification) nếu tài khoản đủ điều kiện; tạo một App Password riêng cho OpenShop. Google không cho dùng mật khẩu đăng nhập Gmail bình thường để xác thực ứng dụng SMTP.
+2. Mở file .env **trong thư mục Laravel trên máy bạn**, thêm hoặc sửa các dòng:
+
+```dotenv
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=toantoan482005@gmail.com
+MAIL_PASSWORD="THAY_BANG_MAT_KHAU_UNG_DUNG"
+MAIL_FROM_ADDRESS=toantoan482005@gmail.com
+MAIL_FROM_NAME="OpenShop"
+MAIL_TIMEOUT=15
+```
+
+3. Mở Terminal trong VS Code, chạy:
+
+```powershell
+php artisan optimize:clear
+php artisan openshop:mail-test
+```
+
+Lệnh thử nghiệm gửi **một email về chính địa chỉ người gửi** (trừ khi cung cấp tùy chọn --to=). Kiểm tra Hộp thư đến và Spam của Gmail. Nếu chưa cấu hình SMTP, MAIL_MAILER mặc định là log: Laravel chỉ ghi thông báo vào storage/logs/laravel.log và **không gửi email thật**.
+
+**Kiểm tra nghiệp vụ:** đăng nhập Customer bằng một email của bạn → đặt đơn COD → xem thư xác nhận; chuyển trạng thái bằng Admin → xem thư cập nhật; thử hủy đơn thứ hai và xem thư hủy. Nội dung email có giao diện HTML và bản text dự phòng.
+
+**Bảo mật và độ tin cậy:** Không chia sẻ App Password, mật khẩu Gmail hoặc mã xác minh; không commit file .env. Email chỉ gửi sau khi transaction MySQL đã commit; lỗi gửi SMTP không làm thất lạc đơn hàng hoặc hoàn kho. Gửi SMTP đang là chế độ đồng bộ để demo thuận tiện; khi đưa lên hosting thực tế với nhiều khách cần queue, theo dõi lỗi và retry. SMTP có thể chậm hoặc bị Gmail giới hạn số lần gửi.
+
 ## Chức năng
 
 - **Khách:** đăng ký, đăng nhập, đăng xuất; xem/tìm/lọc/sắp xếp sản phẩm, phân trang.

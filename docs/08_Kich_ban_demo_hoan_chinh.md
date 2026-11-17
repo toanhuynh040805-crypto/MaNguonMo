@@ -50,3 +50,15 @@ Chụp trang chủ, bộ lọc, đăng ký/đăng nhập, tài khoản, giỏ h�
 - Tab **Actions** trên GitHub cho commit đang chuẩn bị báo cáo
 - Chạy trên trình duyệt Chrome desktop và chế độ màn hình mobile (F12 → Toggle device toolbar)
 - Tuyệt đối không commit file `.env`, mật khẩu hoặc dữ liệu khách thật.
+
+
+## Bổ sung demo email cho khách hàng
+
+Trước buổi demo, cấu hình Gmail SMTP và App Password trong file .env trên máy riêng, chạy php artisan openshop:mail-test và kiểm tra email thử. **Không trình chiếu mật khẩu ứng dụng.**
+
+1. Customer đăng nhập bằng email của bạn và đặt một đơn COD. Mở Inbox hoặc Spam để xem thư xác nhận đơn.
+2. Admin vào Quản lý đơn hàng, chuyển lần lượt Chờ xác nhận → Đã xác nhận → Đang giao → Hoàn tất. Kiểm tra email nhận được sau từng lần.
+3. Tạo đơn thứ hai để thử hủy khi còn Chờ xác nhận, xem thông báo hủy và kiểm tra tồn kho đã được hoàn lại.
+4. Thử chuyển trạng thái không hợp lệ; không phát sinh thông báo mới.
+
+GitHub Actions sử dụng mail giả lập, không gửi thư thật. Kết quả Gmail SMTP cần được xác nhận trực tiếp trên máy hoặc hosting sau khi chủ tài khoản cấu hình.
