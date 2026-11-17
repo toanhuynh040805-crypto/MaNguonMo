@@ -13,14 +13,14 @@
         p { line-height: 1.5; }
         .muted { color: #64748b; font-size: 13px; }
         .row { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-        .brand { font-weight: 900; color: #5d47d9; font-size: 24px; }
+        .brand { font-weight: 900; color: #2463e8; font-size: 24px; }
         table { border-collapse: collapse; width: 100%; margin-top: 18px; }
         th, td { text-align: left; padding: 12px 8px; border-bottom: 1px solid #e2e8f0; }
         th { font-size: 12px; color: #64748b; }
         .right { text-align: right; }
-        .total { font-size: 20px; font-weight: 800; color: #4338ca; }
+        .total { font-size: 20px; font-weight: 800; color: #cf3c3c; }
         .actions { display: flex; justify-content: end; gap: 12px; margin: 0 auto 16px; max-width: 862px; padding-top: 22px; }
-        button { border: 0; border-radius: 9px; padding: 12px 20px; background: #4f46e5; color: #fff; cursor: pointer; }
+        button { border: 0; border-radius: 9px; padding: 12px 20px; background: #2463e8; color: #fff; cursor: pointer; }
         .notice { padding: 14px; background: #f1f5f9; border-radius: 10px; font-size: 13px; }
         @media print {
             body { background: white; }
@@ -34,7 +34,7 @@
     <div class="actions"><button onclick="window.print()">In / Lưu PDF</button></div>
     <main>
         <header class="row">
-            <div><div class="brand">OpenShop.</div><p class="muted">Website bán phụ kiện công nghệ · Bản demo học phần</p></div>
+            <div><div class="brand">OpenShop.</div><p class="muted">Website cửa hàng công nghệ · Bản demo học phần</p></div>
             <div class="right"><h1>PHIẾU ĐƠN HÀNG</h1><p class="muted">Mã: {{ $order->code }}<br>Ngày đặt: {{ $order->created_at->format('d/m/Y H:i') }}</p></div>
         </header>
         <div class="notice">Phiếu xác nhận thông tin đơn hàng, <strong>không phải hóa đơn thuế hoặc chứng từ đã thanh toán</strong>. Phương thức: COD (thanh toán khi nhận).</div>

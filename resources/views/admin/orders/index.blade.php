@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Quản lý đơn hàng')
 @section('admin-content')
-<div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4"><h1 class="section-title mb-0">Quản lý đơn hàng</h1><a class="btn btn-outline-primary" href="{{ route('admin.orders.export', request()->only(['q', 'status', 'date_from', 'date_to'])) }}">⬇ Xuất CSV (theo bộ lọc)</a></div>
+<div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-4"><h1 class="section-title mb-0">Quản lý đơn hàng</h1><a class="btn btn-outline-primary" href="{{ route('admin.orders.export', request()->only(['q', 'status', 'date_from', 'date_to'])) }}"><x-ui-icon name="receipt" :size="17"/> Xuất CSV (theo bộ lọc)</a></div>
 <form method="GET" action="{{ route('admin.orders.index') }}" class="panel p-3 mb-3">
     <div class="row g-2 align-items-end">
         <div class="col-md-6 col-xl-4"><label for="order_q" class="form-label small">Mã đơn, người nhận hoặc email</label><input id="order_q" name="q" class="form-control" maxlength="100" value="{{ request('q') }}" placeholder="DH000001, email..."></div>

@@ -92,6 +92,20 @@ Lệnh thử nghiệm gửi **một email về chính địa chỉ người gử
 
 **Bảo mật và độ tin cậy:** Không chia sẻ App Password, mật khẩu Gmail hoặc mã xác minh; không commit file .env. Email chỉ gửi sau khi transaction MySQL đã commit; lỗi gửi SMTP không làm thất lạc đơn hàng hoặc hoàn kho. Gửi SMTP đang là chế độ đồng bộ để demo thuận tiện; khi đưa lên hosting thực tế với nhiều khách cần queue, theo dõi lỗi và retry. SMTP có thể chậm hoặc bị Gmail giới hạn số lần gửi.
 
+## Giao diện OpenShop phiên bản cửa hàng công nghệ hiện đại
+
+Toàn bộ giao diện người dùng đã được thiết kế lại theo hướng **nhẹ, rõ ràng, dễ thao tác trên mobile**, với cảm hứng từ luồng mua sắm của các cửa hàng công nghệ lớn nhưng không sao chép giao diện, logo hay nội dung của bất kỳ thương hiệu nào.
+
+- Header: logo OpenShop riêng, ô tìm kiếm nổi bật, truy cập giỏ hàng, đơn hàng và tài khoản; danh mục nhanh trên màn hình lớn.
+- Điện thoại: ô tìm kiếm cố định trong header và thanh điều hướng dưới cùng để truy cập trang chủ, danh mục, giỏ hàng/đơn hàng/tài khoản.
+- Trang chủ: banner ảnh chụp thật, hai ô gợi ý điện thoại/laptop, danh mục bằng **icon SVG nét mảnh**, sản phẩm dạng lưới dễ so sánh, lọc và sắp xếp.
+- Chi tiết sản phẩm: ảnh nền trắng, thông tin giá demo nổi bật, tồn kho minh họa, nhập số lượng, thêm giỏ, nhóm sản phẩm cùng loại.
+- Giỏ hàng, thanh toán COD và quản lý đơn Customer: form rõ nhãn, tổng tiền dễ đọc, trạng thái theo dõi, danh sách sản phẩm, email tự động được giữ nguyên.
+- Đăng nhập, đăng ký, tài khoản, Admin: đồng bộ palette xanh navy/blue, góc bo và icon đồng nhất.
+- CSS riêng: \`public/css/storefront-refresh.css\`. Icon có thể tái sử dụng: \`resources/views/components/ui-icon.blade.php\`.
+
+**Chạy thử và chụp ảnh giao diện:** \`git pull origin main\`, \`php artisan optimize:clear\`, \`php artisan serve\`, sau đó tải lại bằng Ctrl+F5. Không cần migrate hay seeder để đổi giao diện. Nếu chưa có 17 mẫu bổ sung, dùng \`php artisan db:seed --class=ModernCatalogSeeder\` đúng một lần (Seeder idempotent). Kiểm tra màn hình máy tính và chế độ mobile 390 px trong Chrome DevTools.
+
 ## Chức năng
 
 - **Khách:** đăng ký, đăng nhập, đăng xuất; xem/tìm/lọc/sắp xếp sản phẩm, phân trang.

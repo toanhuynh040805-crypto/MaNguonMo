@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('title', 'Quản lý danh mục')
 @section('admin-content')
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4"><h1 class="section-title mb-0">Quản lý danh mục</h1><a class="btn btn-primary" href="{{ route('admin.categories.create') }}">+ Thêm danh mục</a></div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4"><h1 class="section-title mb-0">Quản lý danh mục</h1><a class="btn btn-primary" href="{{ route('admin.categories.create') }}"><x-ui-icon name="plus" :size="17"/> Thêm danh mục</a></div>
 <form method="GET" action="{{ route('admin.categories.index') }}" class="d-flex gap-2 mb-3"><input name="q" class="form-control" value="{{ request('q') }}" placeholder="Tìm danh mục..." aria-label="Tìm danh mục"><button class="btn btn-outline-primary">Tìm kiếm</button></form>
 <div class="panel overflow-hidden"><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>#</th><th>Danh mục</th><th>Đường dẫn</th><th>Số sản phẩm</th><th>Thao tác</th></tr></thead><tbody>
 @forelse($categories as $category)
