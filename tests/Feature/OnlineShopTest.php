@@ -961,4 +961,21 @@ class OnlineShopTest extends TestCase
             ->assertExitCode(1);
     }
 
+
+    public function test_admin_product_table_has_fixed_thumbnail_and_wrapping_layout(): void
+    {
+        $product = $this->product(stock: 8);
+        $product->update(['name' => 'Tên sản phẩm công nghệ siêu dài để kiểm tra không bị chồng chữ giữa các cột']);
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $this->actingAs($admin)
+            ->get(route('admin.products.index'))
+            ->assertOk()
+            ->assertSee('admin-products-table')
+            ->assertSee('admin-products-scroll')
+            ->assertSee('admin-product-cell')
+            ->assertSee('admin-thumbnail')
+            ->assertSee($product->name);
+    }
+
 }
