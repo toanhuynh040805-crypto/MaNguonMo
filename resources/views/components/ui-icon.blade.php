@@ -1,0 +1,47 @@
+@props(['name' => 'package', 'size' => 20, 'stroke' => 1.8])
+@php
+    // All icon paths are hard-coded here; user data is never inserted as SVG markup.
+    $paths = [
+        'search' => '<circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/>',
+        'shopping-cart' => '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.4a2 2 0 0 0 2 1.6h9.72a2 2 0 0 0 2-1.6L23 6H6"/>',
+        'user' => '<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>',
+        'package' => '<path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="M3 7v10l9 5 9-5V7M12 12v10"/>',
+        'smartphone' => '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+        'laptop' => '<rect x="4" y="3" width="16" height="13" rx="2"/><path d="M2 20h20l-2-4H4l-2 4Z"/>',
+        'tablet' => '<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+        'watch' => '<circle cx="12" cy="12" r="6"/><path d="m9 6 1-4h4l1 4m-6 12 1 4h4l1-4M12 9v3l2 1"/>',
+        'headphones' => '<path d="M3 14v-3a9 9 0 0 1 18 0v3"/><rect x="3" y="13" width="4" height="8" rx="2"/><rect x="17" y="13" width="4" height="8" rx="2"/>',
+        'gamepad' => '<path d="M7 7h10a4 4 0 0 1 3.9 3.1L22 16a2 2 0 0 1-3 2l-3-2H8l-3 2a2 2 0 0 1-3-2l1.1-5.9A4 4 0 0 1 7 7Z"/><path d="M8 10v5m-2.5-2.5h5M16 11h.01M18 13h.01"/>',
+        'keyboard' => '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M7 16h10"/>',
+        'mouse' => '<rect x="6" y="2" width="12" height="20" rx="6"/><path d="M12 2v7"/>',
+        'cable' => '<path d="M8 8V4m8 4V4M6 8h12v3a6 6 0 0 1-12 0V8ZM12 17v5"/>',
+        'grid' => '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+        'arrow-right' => '<path d="M5 12h14m-7-7 7 7-7 7"/>',
+        'arrow-left' => '<path d="M19 12H5m7 7-7-7 7-7"/>',
+        'chevron-right' => '<path d="m9 18 6-6-6-6"/>',
+        'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
+        'shield-check' => '<path d="m12 22 8-4V6l-8-4-8 4v12l8 4Z"/><path d="m9 12 2 2 4-4"/>',
+        'truck' => '<path d="M1 5h14v12H1zM15 9h4l4 4v4h-8"/><circle cx="5" cy="18" r="2"/><circle cx="18" cy="18" r="2"/>',
+        'mail' => '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/>',
+        'check-circle' => '<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>',
+        'menu' => '<path d="M4 6h16M4 12h16M4 18h16"/>',
+        'log-out' => '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+        'receipt' => '<path d="M4 2h16v20l-4-2-4 2-4-2-4 2V2Z"/><path d="M8 7h8M8 11h8M8 15h5"/>',
+        'dashboard' => '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
+        'folder' => '<path d="M3 5h6l2 2h10v12H3V5Z"/>',
+        'credit-card' => '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20M6 16h4"/>',
+        'map-pin' => '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
+        'phone' => '<path d="M22 16.9v3a2 2 0 0 1-2.2 2A19 19 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7l.5 3a2 2 0 0 1-.6 1.8L7 10.5a16 16 0 0 0 6.5 6.5l2-2a2 2 0 0 1 1.8-.6l3 .5a2 2 0 0 1 1.7 2Z"/>',
+        'home' => '<path d="m3 10 9-8 9 8v11H3V10Z"/><path d="M9 21v-8h6v8"/>',
+        'filter' => '<path d="M4 7h16M7 12h10M10 17h4"/>',
+        'plus' => '<path d="M12 5v14M5 12h14"/>',
+        'minus' => '<path d="M5 12h14"/>',
+        'trash' => '<path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7"/>',
+        'clock' => '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+        'lock' => '<rect x="4" y="10" width="16" height="12" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+        'sliders' => '<path d="M4 6h16M4 12h16M4 18h16"/><circle cx="8" cy="6" r="2" fill="white"/><circle cx="16" cy="12" r="2" fill="white"/><circle cx="10" cy="18" r="2" fill="white"/>',
+        'info' => '<circle cx="12" cy="12" r="10"/><path d="M12 11v6M12 7h.01"/>',
+    ];
+    $markup = $paths[$name] ?? $paths['package'];
+@endphp
+<svg {{ $attributes->class(['ui-icon']) }} xmlns="http://www.w3.org/2000/svg" width="{{ $size }}" height="{{ $size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="{{ $stroke }}" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">{!! $markup !!}</svg>
