@@ -746,7 +746,7 @@ class OnlineShopTest extends TestCase
         $this->assertCount(15, $models);
         foreach ($models as $model) {
             $photo = \App\Support\RealProductPhotos::forSlug($model->slug);
-            $this->assertNotNull($photo);
+            $this->assertNotNull($photo, 'Missing photo attribution for product slug: ' . $model->slug);
             $this->assertNotEmpty($photo['author']);
             $this->assertFileExists(public_path('images/real-products/' . $model->slug . '.webp'));
         }
