@@ -36,8 +36,9 @@ class ProductController extends Controller
         };
 
         return view('shop.products.index', [
-            'products' => $query->paginate(9)->withQueryString(),
-            'categories' => Category::orderBy('name')->get(),
+            'products' => $query->paginate(12)->withQueryString(),
+            'categories' => Category::withCount(['products as active_products_count' => fn ($q) => $q->where('is_active', true)])
+                ->orderBy('name')->get(),
         ]);
     }
 

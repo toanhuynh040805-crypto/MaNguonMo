@@ -708,4 +708,48 @@ class OnlineShopTest extends TestCase
         $this->assertNull(\App\Support\RealProductPhotos::localUrl('../secret'));
     }
 
+
+    public function test_modern_catalog_seeding_is_idempotent_and_does_not_overwrite_prices(): void
+    {
+        $this->artisan('db:seed', ['--class' => \Database\Seeders\ModernCatalogSeeder::class])->assertExitCode(0);
+        $this->assertDatabaseHas('categories', ['slug' => 'dien-thoai']);
+        $this->assertDatabaseHas('categories', ['slug' => 'laptop']);
+        $this->assertDatabaseHas('categories', ['slug' => 'may-tinh-bang']);
+        $this->assertDatabaseHas('products', ['slug' => 'iphone-16-pro-128gb']);
+        $this->assertSame(17, Product::count());
+        $phone = Product::where('slug', 'iphone-16-pro-128gb')->firstOrFail();
+        $phone->update(['price' => 10000000, 'stock' => 2]);
+        $this->artisan('db:seed', ['--class' => \Database\Seeders\ModernCatalogSeeder::class])->assertExitCode(0);
+        $this->assertSame(17, Product::count());
+        $this->assertSame(10000000, $phone->fresh()->price);
+        $this->assertSame(2, $phone->fresh()->stock);
+    }
+
+    public function test_storefront_has_modern_category_navigation_and_demo_price_disclaimer(): void
+    {
+        $this->artisan('db:seed', ['--class' => \Database\Seeders\ModernCatalogSeeder::class])->assertExitCode(0);
+        $this->get(route('home'))->assertOk()
+            ->assertSee('Điện thoại')->assertSee('Máy tính bảng')
+            ->assertSee('Giá demo')->assertSee('category-tile')
+            ->assertSee('iPhone 16 Pro 128GB');
+        $category = Category::where('slug', 'laptop')->firstOrFail();
+        $this->get(route('home', ['category' => $category->id]))
+            ->assertOk()->assertSee('MacBook Air')->assertDontSee('iPhone 16 Pro 128GB');
+    }
+
+    public function test_all_modern_photo_files_have_attribution_and_exist_locally(): void
+    {
+        $this->artisan('db:seed', ['--class' => \Database\Seeders\ModernCatalogSeeder::class])->assertExitCode(0);
+        $models = Product::whereHas('category', fn ($q) => $q->whereIn('slug', [
+            'dien-thoai', 'laptop', 'may-tinh-bang', 'dong-ho-thong-minh', 'may-choi-game'
+        ]))->get();
+        $this->assertCount(15, $models);
+        foreach ($models as $model) {
+            $photo = \App\Support\RealProductPhotos::forSlug($model->slug);
+            $this->assertNotNull($photo);
+            $this->assertNotEmpty($photo['author']);
+            $this->assertFileExists(public_path('images/real-products/' . $model->slug . '.webp'));
+        }
+    }
+
 }

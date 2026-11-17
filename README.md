@@ -38,6 +38,26 @@ resources/
 
 **Cập nhật:** \`git pull origin main\` sẽ tải 16 ảnh mẫu có trong Git. Ảnh Admin upload trên máy vẫn giữ nguyên; \`git pull\` không cập nhật hay xóa chúng. Không chạy \`php artisan migrate:fresh\`.
 
+## Danh mục hiện đại và ảnh chụp sản phẩm có thật
+
+- Bổ sung **17 sản phẩm công nghệ**, nâng danh mục demo lên **32 sản phẩm**: điện thoại, laptop, máy tính bảng, đồng hồ thông minh, tai nghe, máy chơi game và phụ kiện.
+- Các mẫu tham khảo gồm iPhone 16 Pro, Galaxy S25 Ultra, Galaxy Z Fold6, MacBook Air M4, iPad Air M2, Surface Laptop 7, Apple Watch Series 10, AirPods 4 và Nintendo Switch OLED. Mẫu có thể không còn mới nhất tại thời điểm demo.
+- Các ảnh WebP là ảnh thiết bị thật lấy từ Wikimedia Commons, có tác giả, giấy phép và nguồn tại \`/nguon-anh\`; không sao chép hình từ CellphoneS. Ảnh có thể khác biến thể dung lượng/màu sắc của bản demo.
+- **Giá hiển thị, tồn kho và biến thể là dữ liệu giả lập phục vụ môn học**, không đại diện giá bán hiện hành và không có liên kết thương mại với CellphoneS hay các thương hiệu.
+- Seeder sử dụng \`firstOrCreate\` để không làm mất các giá sản phẩm đã sửa, đơn hàng hay dữ liệu đang có.
+
+**Máy đã clone và đang chạy OpenShop chỉ cần cập nhật mã và thêm dữ liệu mới:**
+
+\`\`\`powershell
+cd E:\MaNguonMo\MaNguonMo_Toan
+git pull origin main
+php artisan db:seed --class=ModernCatalogSeeder
+php artisan optimize:clear
+php artisan serve
+\`\`\`
+
+Không chạy \`php artisan migrate:fresh\`. Chụp lại hình giao diện khi 32 sản phẩm đã xuất hiện và kiểm tra nhập vai Customer/Admin trước khi nộp.
+
 ## Chức năng
 
 - **Khách:** đăng ký, đăng nhập, đăng xuất; xem/tìm/lọc/sắp xếp sản phẩm, phân trang.

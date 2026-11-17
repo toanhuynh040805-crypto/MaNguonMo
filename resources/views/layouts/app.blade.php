@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'OpenShop') | OpenShop</title>
-    <meta name="description" content="OpenShop - Cửa hàng phụ kiện công nghệ với trải nghiệm mua sắm đơn giản.">
+    <meta name="description" content="OpenShop - đồ án cửa hàng công nghệ demo với điện thoại, laptop, máy tính bảng, phụ kiện và quản lý đơn hàng Laravel.">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/openshop.css') }}" rel="stylesheet">
 </head>

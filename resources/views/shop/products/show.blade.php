@@ -8,9 +8,10 @@
         <div class="col-lg-6 pt-lg-3">
             <span class="eyebrow text-primary">{{ $product->category->name }}</span>
             <h1 class="fw-bold display-6 mt-3 mb-3">{{ $product->name }}</h1>
-            <div class="detail-price mb-3">{{ number_format($product->price, 0, ',', '.') }}₫</div>
+            <div class="detail-price mb-1">{{ number_format($product->price, 0, ',', '.') }}₫</div>
+            <p class="small text-muted mb-3">Giá tham khảo phục vụ đồ án, không phải giá bán hiện tại.</p>
             <p class="text-muted fs-6 lh-lg">{{ $product->description ?: 'Sản phẩm công nghệ chất lượng, dễ dàng sử dụng.' }}</p>
-            <p class="fw-medium {{ $product->stock > 0 ? 'text-success' : 'text-danger' }}">{{ $product->stock > 0 ? '● Còn '.$product->stock.' sản phẩm' : '● Đã hết hàng' }}</p>
+            <p class="fw-medium {{ $product->stock > 0 ? 'text-success' : 'text-danger' }}">{{ $product->stock > 0 ? '● Kho demo: '.$product->stock.' sản phẩm' : '● Đã hết hàng' }}</p>
             @auth
                 @if(!auth()->user()->isAdmin() && $product->stock > 0)
                     <form method="POST" action="{{ route('cart.add', $product) }}" class="d-flex flex-wrap gap-3 mt-4" data-ajax-cart>@csrf
