@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Mail\OrderUpdateMail;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
@@ -750,6 +752,151 @@ class OnlineShopTest extends TestCase
             $this->assertNotEmpty($photo['author']);
             $this->assertFileExists(public_path('images/real-products/' . $model->slug . '.webp'));
         }
+    }
+
+
+    public function test_checkout_sends_order_confirmation_to_account_email(): void
+    {
+        Mail::fake();
+        $product = $this->product(stock: 4, price: 250000);
+        $buyer = User::factory()->create(['role' => 'customer', 'email' => 'client@example.test']);
+        $this->actingAs($buyer)->post(route('cart.add', $product), ['quantity' => 2]);
+        $this->post(route('checkout.store'), [
+            'recipient_name' => 'Người nhận demo',
+            'phone' => '0901234567',
+            'address' => 'Số 1, Đường demo, TP.HCM',
+        ])->assertRedirect();
+
+        $order = Order::firstOrFail();
+        Mail::assertSent(OrderUpdateMail::class, function (OrderUpdateMail $mail) use ($buyer, $order): bool {
+            return $mail->hasTo($buyer->email)
+                && $mail->previousStatus === null
+                && $mail->order->id === $order->id
+                && $mail->order->items->first()->quantity === 2
+                && str_contains($mail->envelope()->subject, $order->code);
+        });
+        Mail::assertSentCount(1);
+        $this->assertSame(2, $product->fresh()->stock);
+    }
+
+    public function test_admin_valid_status_transitions_send_one_email_each(): void
+    {
+        Mail::fake();
+        $customer = User::factory()->create(['role' => 'customer', 'email' => 'customer@example.test']);
+        $admin = User::factory()->create(['role' => 'admin']);
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'recipient_name' => 'Người nhận', 'phone' => '0901234567',
+            'address' => 'Số 1', 'total_amount' => 230000,
+            'status' => 'pending',
+        ]);
+
+        $this->actingAs($admin);
+        foreach (['confirmed', 'shipping', 'completed'] as $status) {
+            $this->patch(route('admin.orders.status', $order), ['status' => $status])
+                ->assertSessionHas('success');
+        }
+
+        Mail::assertSentCount(3);
+        foreach ([['pending', 'confirmed'], ['confirmed', 'shipping'], ['shipping', 'completed']] as [$from, $to]) {
+            Mail::assertSent(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
+                $mail->hasTo($customer->email)
+                && $mail->previousStatus === $from
+                && $mail->order->status === $to
+            );
+        }
+        $this->assertNotNull($order->fresh()->completed_at);
+    }
+
+    public function test_admin_cancellation_sends_customer_email_but_rejected_transition_does_not(): void
+    {
+        Mail::fake();
+        $customer = User::factory()->create(['role' => 'customer']);
+        $order = Order::create([
+            'user_id' => $customer->id,
+            'recipient_name' => 'Demo', 'phone' => '0901234567',
+            'address' => 'Địa chỉ', 'total_amount' => 250000,
+            'status' => 'pending',
+        ]);
+        $this->actingAs(User::factory()->create(['role' => 'admin']));
+        $this->patch(route('admin.orders.status', $order), ['status' => 'completed'])
+            ->assertSessionHas('error');
+        Mail::assertNothingSent();
+        $this->patch(route('admin.orders.status', $order), ['status' => 'cancelled'])
+            ->assertSessionHas('success');
+        Mail::assertSentCount(1);
+        Mail::assertSent(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
+            $mail->previousStatus === 'pending'
+            && $mail->order->status === 'cancelled'
+            && $mail->hasTo($customer->email)
+        );
+        $this->patch(route('admin.orders.status', $order), ['status' => 'cancelled'])
+            ->assertSessionHas('error');
+        Mail::assertSentCount(1);
+    }
+
+    public function test_customer_cancellation_emails_only_once(): void
+    {
+        Mail::fake();
+        $product = $this->product(stock: 5);
+        $customer = User::factory()->create(['role' => 'customer']);
+        $this->actingAs($customer)->post(route('cart.add', $product), ['quantity' => 2]);
+        $this->post(route('checkout.store'), [
+            'recipient_name' => 'Khách demo', 'phone' => '0901234567',
+            'address' => 'Số 10',
+        ])->assertRedirect();
+        $order = Order::firstOrFail();
+        Mail::assertSentCount(1);
+
+        $this->patch(route('orders.cancel', $order))->assertSessionHas('success');
+        Mail::assertSentCount(2);
+        Mail::assertSent(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
+            $mail->previousStatus === 'pending'
+            && $mail->order->status === 'cancelled'
+            && $mail->hasTo($customer->email)
+        );
+        $this->patch(route('orders.cancel', $order))->assertSessionHas('error');
+        Mail::assertSentCount(2);
+        $this->assertSame(5, $product->fresh()->stock);
+    }
+
+    public function test_smtp_failure_does_not_undo_checkout_or_inventory(): void
+    {
+        $product = $this->product(stock: 5, price: 120000);
+        $customer = User::factory()->create(['role' => 'customer']);
+        Mail::shouldReceive('to')->once()->andThrow(new \RuntimeException('SMTP temporarily unreachable'));
+        $this->actingAs($customer)->post(route('cart.add', $product), ['quantity' => 2]);
+        $this->post(route('checkout.store'), [
+            'recipient_name' => 'Demo',
+            'phone' => '0901234567',
+            'address' => 'Địa chỉ khách hàng',
+        ])->assertSessionHas('success');
+
+        $this->assertDatabaseCount('orders', 1);
+        $this->assertSame(3, $product->fresh()->stock);
+        $this->assertSame('pending', Order::firstOrFail()->status);
+    }
+
+    public function test_invalid_email_address_is_not_used_for_order_notifications(): void
+    {
+        Mail::fake();
+        $customer = User::factory()->create([
+            'role' => 'customer',
+            'email' => 'broken-email',
+        ]);
+        $order = Order::create([
+            'user_id' => $customer->id, 'recipient_name' => 'Demo',
+            'phone' => '0901234567', 'address' => 'Địa chỉ',
+            'total_amount' => 150000, 'status' => 'pending',
+        ]);
+        $this->assertFalse(app(\App\Services\OrderEmailService::class)->send($order));
+        Mail::assertNothingSent();
+    }
+
+    public function test_mail_test_command_requires_smtp_transport(): void
+    {
+        config(['mail.default' => 'array']);
+        $this->artisan('openshop:mail-test')->assertExitCode(1);
     }
 
 }
