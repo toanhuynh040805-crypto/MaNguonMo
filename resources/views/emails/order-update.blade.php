@@ -49,6 +49,10 @@
         @endforeach
         </tbody>
       </table>
+      @if($order->discount_amount > 0)
+      <p style="margin:0;text-align:right;color:#56627a">Tạm tính: {{ number_format($order->subtotal_amount, 0, ',', '.') }} ₫</p>
+      <p style="margin:4px 0 0;text-align:right;color:#16794c">Mã {{ $order->coupon_code }}: −{{ number_format($order->discount_amount, 0, ',', '.') }} ₫</p>
+      @endif
       <p style="font-size:18px;font-weight:bold;text-align:right">Tổng đơn: {{ number_format($order->total_amount, 0, ',', '.') }} ₫</p>
       <h2 style="font-size:17px;margin-top:24px">Thông tin nhận hàng</h2>
       <p style="font-size:14px;line-height:1.8">

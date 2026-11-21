@@ -1,11 +1,17 @@
-@props(['product'])
+@props(['product', 'wishlisted' => false])
 <article class="card product-card h-100">
-    <a href="{{ route('products.show', $product->slug) }}" class="product-photo-link text-decoration-none" aria-label="Xem {{ $product->name }}">
-        <x-product-art :product="$product" />
-    </a>
+    <div class="product-photo-wrap">
+        <a href="{{ route('products.show', $product->slug) }}" class="product-photo-link text-decoration-none" aria-label="Xem {{ $product->name }}">
+            <x-product-art :product="$product" />
+        </a>
+        <x-wishlist-button :product="$product" :saved="$wishlisted" class="card-wishlist" />
+    </div>
     <div class="card-body d-flex flex-column">
         <div class="product-category">{{ $product->category?->name ?? 'Thiết bị' }}</div>
         <a href="{{ route('products.show', $product->slug) }}" class="text-decoration-none"><h3 class="product-name">{{ $product->name }}</h3></a>
+        @if(($product->reviews_count ?? 0) > 0)
+            <x-star-rating :rating="$product->reviews_avg_rating" :count="$product->reviews_count" :size="13" class="mb-1" />
+        @endif
         <div class="card-bottom">
             <div>
                 <div class="product-price">{{ number_format($product->price, 0, ',', '.') }}₫</div>

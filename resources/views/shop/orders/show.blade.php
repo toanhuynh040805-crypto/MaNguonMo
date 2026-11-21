@@ -17,6 +17,10 @@
                     <strong class="text-nowrap">{{ number_format($item->subtotal, 0, ',', '.') }}₫</strong>
                 </div>
             @endforeach
+            @if($order->discount_amount > 0)
+                <div class="summary-row"><span>Tạm tính</span><span>{{ number_format($order->subtotal_amount, 0, ',', '.') }}₫</span></div>
+                <div class="summary-row text-success"><span>Mã {{ $order->coupon_code }}</span><strong>−{{ number_format($order->discount_amount, 0, ',', '.') }}₫</strong></div>
+            @endif
             <div class="summary-row summary-total"><span>Tổng cộng</span><strong>{{ number_format($order->total_amount, 0, ',', '.') }}₫</strong></div>
             <p class="price-note mb-0">Giá demo · Thanh toán khi nhận hàng (COD)</p>
         </section>

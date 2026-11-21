@@ -17,6 +17,7 @@
                     @csrf @method('PATCH')
                     <div class="mb-3"><label class="form-label" for="profile_name">Họ và tên</label><input class="form-control form-control-lg" type="text" id="profile_name" name="name" value="{{ old('name', $user->name) }}" maxlength="120" required autocomplete="name"></div>
                     <div class="mb-3"><label class="form-label" for="profile_email">Địa chỉ email</label><input class="form-control form-control-lg" type="email" id="profile_email" name="email" value="{{ old('email', $user->email) }}" maxlength="255" required autocomplete="email"></div>
+                    <div class="mb-3"><label class="form-label" for="profile_current_password">Mật khẩu hiện tại <span class="text-muted fw-normal">(bắt buộc khi đổi email)</span></label><input class="form-control form-control-lg" type="password" id="profile_current_password" name="current_password" autocomplete="current-password"></div>
                     <p class="small text-muted mb-4">Vai trò: <strong>{{ $user->isAdmin() ? 'Quản trị viên' : 'Khách hàng' }}</strong></p>
                     <button type="submit" class="btn btn-primary px-4">Lưu thay đổi</button>
                 </form>

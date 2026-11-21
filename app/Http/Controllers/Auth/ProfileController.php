@@ -22,10 +22,16 @@ class ProfileController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-        ]);
+            // Order notifications and password resets go to this address, so
+            // changing it requires proving the account owner is present.
+            'current_password' => [
+                Rule::requiredIf(fn () => strcasecmp((string) $request->input('email'), $user->email) !== 0),
+                'nullable', 'current_password',
+            ],
+        ], ['current_password.required' => 'Nhập mật khẩu hiện tại để đổi email.']);
 
         // The role cannot be edited by submitting extra form parameters.
-        $user->update($data);
+        $user->update(['name' => $data['name'], 'email' => $data['email']]);
 
         return redirect()->route('profile.edit')->with('success', 'Đã cập nhật thông tin tài khoản.');
     }

@@ -51,3 +51,39 @@ function showCartNotice(message, type) {
     container.append(close);
     document.body.append(container);
 }
+
+/* Wishlist heart buttons: toggle without reloading; plain POST still works without JS. */
+document.addEventListener('submit', async (event) => {
+    const form = event.target.closest('form[data-ajax-wishlist]');
+    if (!form || !window.fetch) return;
+    event.preventDefault();
+
+    const button = form.querySelector('button');
+    if (button?.disabled) return;
+    if (button) button.disabled = true;
+
+    try {
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: new FormData(form),
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Không thể cập nhật yêu thích.');
+
+        // The same product may appear several times on a page (grid + related).
+        document.querySelectorAll(`form[data-ajax-wishlist][action="${form.getAttribute('action')}"] button`).forEach((toggle) => {
+            toggle.classList.toggle('is-saved', data.saved);
+            toggle.setAttribute('aria-pressed', data.saved ? 'true' : 'false');
+            toggle.title = data.saved ? 'Bỏ khỏi yêu thích' : 'Lưu vào yêu thích';
+            const label = toggle.querySelector('[data-wishlist-label]');
+            if (label) label.textContent = data.saved ? 'Đã yêu thích' : 'Yêu thích';
+        });
+        showCartNotice(data.message, 'success');
+    } catch (error) {
+        showCartNotice(error.message || 'Có lỗi kết nối. Vui lòng thử lại.', 'danger');
+    } finally {
+        if (button) button.disabled = false;
+    }
+});

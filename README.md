@@ -116,6 +116,35 @@ Toàn bộ giao diện người dùng đã được thiết kế lại theo hư�
 
 Sơ đồ ERD, Use Case, kiến trúc, báo cáo, test case, kịch bản demo và phân công nhóm nằm trong `docs/`.
 
+### Bổ sung (11/2026)
+
+- **Quên mật khẩu** (`/quen-mat-khau`) dùng Password Broker của Laravel, email tiếng Việt, liên kết hết hạn sau 60 phút.
+- **Lọc theo khoảng giá** và **sắp xếp theo đánh giá** trên trang chủ.
+- **Sản phẩm yêu thích** (`/yeu-thich`): nút trái tim AJAX trên thẻ và trang chi tiết; bảng `wishlists`.
+- **Đánh giá sản phẩm**: chỉ khách có đơn **Hoàn tất** chứa sản phẩm mới được đánh giá (`ProductPolicy::review`); mỗi khách một đánh giá, gửi lại là sửa; Admin kiểm duyệt tại **Admin → Đánh giá**.
+- **Admin → Người dùng**: tìm kiếm, xem số đơn/tổng mua, **khóa/mở khóa** tài khoản khách (`users.locked_at`); tài khoản bị khóa không đăng nhập được và bị đăng xuất ngay ở lần truy cập kế tiếp.
+- **Dashboard**: top 5 sản phẩm bán chạy theo đơn hoàn tất.
+- **Đường dẫn (slug) cố định**: đổi tên sản phẩm/danh mục không còn đổi URL hay làm mất ảnh chụp mẫu; Admin có thể sửa slug thủ công nếu thật sự cần.
+- Đổi email tài khoản phải nhập mật khẩu hiện tại; khách tìm đơn theo mã hoặc tên sản phẩm.
+- Kỹ thuật: `OrderService` dùng chung cho đặt hàng/chuyển trạng thái/hoàn kho, FormRequest, `OrderPolicy`, View Composer có cache cho menu.
+
+- **Mã giảm giá**: giảm % (có mức trần) hoặc số tiền, đơn tối thiểu, số lượt, thời gian áp dụng. Khách nhập mã ở giỏ hàng; mã được kiểm tra lại có khóa dòng khi đặt hàng nên không vượt số lượt; hủy đơn trả lại lượt dùng. Admin quản lý ở **Admin → Mã giảm giá**. Mã demo: `OPENSHOP10`, `GIAM200K` (`php artisan db:seed --class=CouponSeeder`).
+- **Email qua hàng đợi (Queue)**: `OrderUpdateMail` implements `ShouldQueue`, thử lại 3 lần. Với `QUEUE_CONNECTION=sync` (mặc định Laragon) email vẫn gửi ngay; đặt `QUEUE_CONNECTION=database` và chạy `php artisan queue:work` để gửi nền.
+- **Thông báo trong web**: chuông trên header (Laravel Notifications, kênh `database`). Khách nhận thông báo mỗi lần đơn đổi trạng thái; Admin nhận thông báo khi có đơn mới hoặc khách hủy đơn.
+
+Sau khi `git pull`, chạy `php artisan migrate` để tạo các migration mới (không cần `migrate:fresh`).
+
+## Chạy bằng Docker (không cần Laragon)
+
+```powershell
+docker compose up -d --build      # lần đầu mất vài phút để cài thư viện
+# mở http://127.0.0.1:8000  — Admin: admin@example.test / AdminOpenShop123 (chỉ dùng local)
+docker compose exec app sh docker/run-tests.sh   # chạy test trên SQLite, không đụng MySQL
+docker compose down               # tắt; dữ liệu MySQL được giữ trong volume
+```
+
+Container tự `migrate`, `db:seed`, `storage:link` khi khởi động. Service `queue` chạy `queue:work` để gửi email nền; sau khi sửa code PHP hãy chạy `docker compose restart queue`. Email ở chế độ `log` (`storage/logs/laravel.log`). **Không** chạy `php artisan test` trực tiếp trong container: biến môi trường Docker sẽ trỏ test vào MySQL — `tests/TestCase.php` đã chặn trường hợp này.
+
 ## ĐÃ CLONE VÀ CHẠY ĐƯỢC WEBSITE? CHỈ CẦN CẬP NHẬT
 
 Mở **Terminal của VS Code** trong thư mục hiện tại (ví dụ `E:\MaNguonMo\MaNguonMo_Toan`), **không clone lại**:

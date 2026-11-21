@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\In;
 
 class Order extends Model
 {
@@ -26,11 +28,26 @@ class Order extends Model
 
     protected $fillable = [
         'user_id', 'recipient_name', 'phone', 'address', 'note', 'total_amount', 'status', 'completed_at',
+        'subtotal_amount', 'discount_amount', 'coupon_id', 'coupon_code',
     ];
 
     protected function casts(): array
     {
-        return ['total_amount' => 'integer', 'completed_at' => 'datetime'];
+        return [
+            'total_amount' => 'integer', 'subtotal_amount' => 'integer', 'discount_amount' => 'integer',
+            'completed_at' => 'datetime',
+        ];
+    }
+
+    public function coupon(): BelongsTo
+    {
+        return $this->belongsTo(Coupon::class);
+    }
+
+    /** Validation rule accepting any known status (single source of truth). */
+    public static function statusRule(): In
+    {
+        return Rule::in(array_keys(self::STATUSES));
     }
 
     public function user(): BelongsTo

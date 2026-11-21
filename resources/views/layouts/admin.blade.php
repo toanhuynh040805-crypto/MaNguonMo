@@ -10,6 +10,9 @@
                 <a class="admin-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}"><x-ui-icon name="grid" :size="18"/> Danh mục</a>
                 <a class="admin-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}"><x-ui-icon name="package" :size="18"/> Sản phẩm</a>
                 <a class="admin-link {{ request()->routeIs('admin.orders.*') ? 'active' : '' }}" href="{{ route('admin.orders.index') }}"><x-ui-icon name="receipt" :size="18"/> Đơn hàng</a>
+                <a class="admin-link {{ request()->routeIs('admin.coupons.*') ? 'active' : '' }}" href="{{ route('admin.coupons.index') }}"><x-ui-icon name="tag" :size="18"/> Mã giảm giá</a>
+                <a class="admin-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}"><x-ui-icon name="users" :size="18"/> Người dùng</a>
+                <a class="admin-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}" href="{{ route('admin.reviews.index') }}"><x-ui-icon name="star" :size="18"/> Đánh giá</a>
                 <div class="sidebar-divider"></div>
                 <a class="admin-link" href="{{ route('home') }}"><x-ui-icon name="arrow-left" :size="18"/> Xem cửa hàng</a>
             </nav>

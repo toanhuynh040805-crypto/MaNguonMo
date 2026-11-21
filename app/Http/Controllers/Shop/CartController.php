@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,7 @@ use Illuminate\View\View;
 
 class CartController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, CartService $cartService): View
     {
         $cart = $request->session()->get('cart', []);
         $products = Product::with('category')->whereIn('id', array_keys($cart))->get()->keyBy('id');
@@ -27,9 +28,16 @@ class CartController extends Controller
             return $product ? ['product' => $product, 'quantity' => (int) $quantity, 'subtotal' => $product->price * $quantity] : null;
         })->filter()->values();
 
+        $subtotal = (int) $items->sum('subtotal');
+        $coupon = $cartService->couponPreview($subtotal);
+
         return view('shop.cart.index', [
             'items' => $items,
-            'total' => $items->sum('subtotal'),
+            'subtotal' => $subtotal,
+            'coupon' => $coupon['coupon'],
+            'discount' => $coupon['discount'],
+            'couponError' => $coupon['error'],
+            'total' => $subtotal - $coupon['discount'],
             'canCheckout' => $items->isNotEmpty() && $items->every(fn ($item) => $item['product']->is_active && $item['product']->stock >= $item['quantity']),
         ]);
     }

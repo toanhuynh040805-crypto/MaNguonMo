@@ -50,7 +50,12 @@
                 <tr><td>{{ $item->product_name }}</td><td class="right">{{ number_format($item->price, 0, ',', '.') }}₫</td><td class="right">{{ $item->quantity }}</td><td class="right">{{ number_format($item->subtotal, 0, ',', '.') }}₫</td></tr>
             @endforeach
             </tbody>
-            <tfoot><tr><td colspan="3" class="right"><strong>Tổng giá trị đơn hàng</strong></td><td class="right total">{{ number_format($order->total_amount, 0, ',', '.') }}₫</td></tr></tfoot>
+            <tfoot>
+                @if($order->discount_amount > 0)
+                    <tr><td colspan="3" class="right">Tạm tính</td><td class="right">{{ number_format($order->subtotal_amount, 0, ',', '.') }}₫</td></tr>
+                    <tr><td colspan="3" class="right">Mã giảm giá {{ $order->coupon_code }}</td><td class="right">−{{ number_format($order->discount_amount, 0, ',', '.') }}₫</td></tr>
+                @endif
+                <tr><td colspan="3" class="right"><strong>Tổng giá trị đơn hàng</strong></td><td class="right total">{{ number_format($order->total_amount, 0, ',', '.') }}₫</td></tr></tfoot>
         </table>
         <p class="muted" style="margin-top:38px">OpenShop · Tài liệu in phục vụ việc đối chiếu đơn hàng trong hệ thống demo.</p>
     </main>

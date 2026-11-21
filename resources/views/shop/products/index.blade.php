@@ -68,7 +68,7 @@
             </div>
             <span class="catalog-results">{{ $products->total() }} sản phẩm · Giá minh họa</span>
         </div>
-        <form method="GET" action="{{ route('home') }}#danh-sach" class="catalog-toolbar">
+        <form method="GET" action="{{ route('home') }}#danh-sach" class="catalog-toolbar has-price">
             <div class="catalog-keyword">
                 <label for="catalog-q">Tìm sản phẩm</label>
                 <input class="form-control" type="search" id="catalog-q" name="q" value="{{ request('q') }}" placeholder="Tên máy, sản phẩm, phụ kiện...">
@@ -83,23 +83,31 @@
                 </select>
             </div>
             <div>
+                <label for="catalog-min-price">Khoảng giá (₫)</label>
+                <div class="price-range">
+                    <input class="form-control" type="number" id="catalog-min-price" name="min_price" min="0" step="100000" value="{{ request('min_price') }}" placeholder="Từ" aria-label="Giá từ">
+                    <input class="form-control" type="number" name="max_price" min="0" step="100000" value="{{ request('max_price') }}" placeholder="Đến" aria-label="Giá đến">
+                </div>
+            </div>
+            <div>
                 <label for="catalog-sort">Sắp xếp theo</label>
                 <select class="form-select" id="catalog-sort" name="sort">
                     <option value="latest" @selected(request('sort', 'latest') === 'latest')>Mới nhất</option>
                     <option value="price_asc" @selected(request('sort') === 'price_asc')>Giá từ thấp đến cao</option>
                     <option value="price_desc" @selected(request('sort') === 'price_desc')>Giá từ cao đến thấp</option>
+                    <option value="rating" @selected(request('sort') === 'rating')>Đánh giá cao nhất</option>
                 </select>
             </div>
             <div class="catalog-submit">
                 <button class="btn btn-primary" type="submit"><x-ui-icon name="filter" :size="17"/> Lọc</button>
             </div>
         </form>
-        @if(request('category') || request('q') || (request('sort') && request('sort') !== 'latest'))
+        @if(request('category') || request('q') || request('min_price') || request('max_price') || (request('sort') && request('sort') !== 'latest'))
             <div class="mb-3"><a href="{{ route('home') }}#danh-sach" class="filter-reset"><x-ui-icon name="arrow-left" :size="15"/> Xóa bộ lọc, xem tất cả</a></div>
         @endif
         <div class="row g-2 g-md-3">
             @forelse($products as $product)
-                <div class="col-6 col-md-4 col-xl-3"><x-product-card :product="$product" /></div>
+                <div class="col-6 col-md-4 col-xl-3"><x-product-card :product="$product" :wishlisted="in_array($product->id, $wishlistIds, true)" /></div>
             @empty
                 <div class="col-12">
                     <div class="no-results">

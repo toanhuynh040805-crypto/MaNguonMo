@@ -40,7 +40,7 @@ class AuthController extends Controller
 
         Auth::login($user);
         $request->session()->regenerate();
-        $request->session()->forget('cart');
+        $request->session()->forget(['cart', 'coupon']);
 
         return redirect()->route('home')->with('success', 'Tạo tài khoản thành công!');
     }
@@ -56,9 +56,14 @@ class AuthController extends Controller
             return back()->withErrors(['email' => 'Email hoặc mật khẩu không đúng.'])->onlyInput('email');
         }
 
+        if (Auth::user()->isLocked()) {
+            Auth::logout();
+            return back()->withErrors(['email' => 'Tài khoản đã bị khóa. Vui lòng liên hệ quản trị viên.'])->onlyInput('email');
+        }
+
         $request->session()->regenerate();
         // Session carts belong to one authenticated user; never transfer them.
-        $request->session()->forget('cart');
+        $request->session()->forget(['cart', 'coupon']);
 
         $default = Auth::user()->isAdmin() ? route('admin.dashboard') : route('home');
         return redirect()->intended($default)->with('success', 'Đăng nhập thành công!');

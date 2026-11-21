@@ -9,7 +9,7 @@
     <title>@yield('title', 'Cửa hàng công nghệ') | OpenShop</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/openshop.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/storefront-refresh.css') }}?v=1" rel="stylesheet">
+    <link href="{{ asset('css/storefront-refresh.css') }}?v=3" rel="stylesheet">
 </head>
 <body>
 <div class="utility-strip">
@@ -38,12 +38,18 @@
                     @if(auth()->user()->isAdmin())
                         <a class="header-action d-none d-md-flex" href="{{ route('admin.dashboard') }}"><x-ui-icon name="dashboard"/><span>Quản trị</span></a>
                     @else
+                        <a class="header-action d-none d-md-flex" href="{{ route('wishlist.index') }}"><x-ui-icon name="heart"/><span>Yêu thích</span></a>
                         <a class="header-action d-none d-md-flex" href="{{ route('orders.index') }}"><x-ui-icon name="receipt"/><span>Đơn hàng</span></a>
                         <a class="header-action cart-header-action" href="{{ route('cart.index') }}" aria-label="Giỏ hàng">
                             <span class="header-icon-wrap"><x-ui-icon name="shopping-cart" :size="22"/><span class="cart-count" data-cart-count>{{ array_sum(session('cart', [])) }}</span></span>
                             <span class="d-none d-sm-inline">Giỏ hàng</span>
                         </a>
                     @endif
+                    {{-- $unreadNotificationCount comes from the layout view composer --}}
+                    <a class="header-action" href="{{ route('notifications.index') }}" aria-label="Thông báo{{ $unreadNotificationCount ? ', '.$unreadNotificationCount.' chưa đọc' : '' }}">
+                        <span class="header-icon-wrap"><x-ui-icon name="bell" :size="22"/>@if($unreadNotificationCount)<span class="cart-count">{{ $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount }}</span>@endif</span>
+                        <span class="d-none d-xl-inline">Thông báo</span>
+                    </a>
                     <a class="header-action d-none d-md-flex" href="{{ route('profile.edit') }}"><x-ui-icon name="user"/><span>Tài khoản</span></a>
                     <form method="POST" action="{{ route('logout') }}" class="m-0 d-none d-xl-block">@csrf<button type="submit" class="header-logout" title="Đăng xuất" aria-label="Đăng xuất"><x-ui-icon name="log-out" :size="19"/></button></form>
                 @else
@@ -62,11 +68,7 @@
         <div class="container">
             <nav class="navigation-list" aria-label="Danh mục nhanh">
                 <a href="{{ route('home') }}" class="{{ request()->routeIs('home') && !request('category') && !request('q') ? 'is-current' : '' }}"><x-ui-icon name="home" :size="17"/> Trang chủ</a>
-                @php
-                    $mainSlugs = ['dien-thoai', 'laptop', 'may-tinh-bang', 'dong-ho-thong-minh', 'am-thanh', 'phu-kien'];
-                    $navCategories = \App\Models\Category::query()->whereIn('slug', $mainSlugs)->get()->sortBy(fn ($item) => array_search($item->slug, $mainSlugs));
-                    $navIcons = ['dien-thoai' => 'smartphone', 'laptop' => 'laptop', 'may-tinh-bang' => 'tablet', 'dong-ho-thong-minh' => 'watch', 'am-thanh' => 'headphones', 'phu-kien' => 'cable'];
-                @endphp
+                {{-- $navCategories / $navIcons come from App\View\Composers\NavigationComposer --}}
                 @foreach($navCategories as $category)
                     <a href="{{ route('home', ['category' => $category->id]) }}#danh-sach" class="{{ request()->routeIs('home') && request('category') == $category->id ? 'is-current' : '' }}">
                         <x-ui-icon :name="$navIcons[$category->slug] ?? 'package'" :size="17"/> {{ $category->name }}
@@ -113,6 +115,7 @@
                         <a href="{{ route('admin.dashboard') }}">Trang quản trị</a>
                     @else
                         <a href="{{ route('orders.index') }}">Đơn hàng của tôi</a>
+                        <a href="{{ route('wishlist.index') }}">Sản phẩm yêu thích</a>
                         <a href="{{ route('cart.index') }}">Giỏ hàng</a>
                     @endif
                 @else
@@ -149,7 +152,7 @@
 </nav>
 @endunless
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('js/shop.js') }}" defer></script>
+<script src="{{ asset('js/shop.js') }}?v=2" defer></script>
 @stack('scripts')
 </body>
 </html>

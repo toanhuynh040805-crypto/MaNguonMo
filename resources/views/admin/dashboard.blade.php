@@ -29,6 +29,21 @@
         @endforeach
     </div>
 </div>
+<div class="panel p-4 mb-4">
+    <div class="d-flex flex-wrap justify-content-between gap-2 align-items-center mb-3">
+        <div><h2 class="h5 fw-bold mb-1">Sản phẩm bán chạy</h2><p class="small text-muted mb-0">Top 5 theo số lượng trong các đơn đã hoàn tất · {{ $customerCount }} khách hàng · {{ $reviewCount }} đánh giá</p></div>
+    </div>
+    @forelse($topProducts as $index => $item)
+        <div class="d-flex align-items-center gap-3 py-2 {{ $loop->last ? '' : 'border-bottom' }}">
+            <span class="top-product-rank">{{ $index + 1 }}</span>
+            <div class="flex-grow-1 fw-semibold">{{ $item->product_name }}</div>
+            <div class="text-muted small text-nowrap">{{ (int) $item->sold }} đã bán</div>
+            <div class="fw-semibold text-nowrap">{{ number_format((int) $item->revenue, 0, ',', '.') }}₫</div>
+        </div>
+    @empty
+        <p class="text-muted mb-0">Chưa có đơn hoàn tất để thống kê.</p>
+    @endforelse
+</div>
 <div class="panel overflow-hidden"><div class="p-4 d-flex justify-content-between align-items-center"><h2 class="h5 fw-bold mb-0">Đơn hàng gần đây</h2><a href="{{ route('admin.orders.index') }}" class="small">Xem tất cả <x-ui-icon name="arrow-right" :size="16"/></a></div>
 <div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Giá trị</th><th>Trạng thái</th><th></th></tr></thead><tbody>@forelse($recentOrders as $order)
     <tr><td class="fw-semibold">{{ $order->code }}</td><td>{{ $order->user->name }}</td><td>{{ number_format($order->total_amount, 0, ',', '.') }}₫</td><td><x-order-badge :status="$order->status" /></td><td><a class="btn btn-sm btn-outline-primary" href="{{ route('admin.orders.show', $order) }}">Xem</a></td></tr>

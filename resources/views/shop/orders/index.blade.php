@@ -5,7 +5,7 @@
     <div class="page-intro"><div class="eyebrow">TÀI KHOẢN KHÁCH HÀNG</div><h1 class="section-title">Đơn hàng của tôi</h1><p>Theo dõi quá trình xử lý và xem lại các đơn hàng bạn đã đặt.</p></div>
     <form method="GET" action="{{ route('orders.index') }}" class="panel p-3 p-md-4 mb-4">
         <div class="row g-3 align-items-end">
-            <div class="col-md-5"><label class="form-label" for="my_order_q">Mã đơn hàng</label><input id="my_order_q" name="q" class="form-control" maxlength="30" value="{{ request('q') }}" placeholder="Ví dụ: DH000001"></div>
+            <div class="col-md-5"><label class="form-label" for="my_order_q">Mã đơn hoặc tên sản phẩm</label><input id="my_order_q" name="q" class="form-control" maxlength="100" value="{{ request('q') }}" placeholder="Ví dụ: DH000001, iPhone"></div>
             <div class="col-md-4"><label class="form-label" for="my_order_status">Trạng thái đơn</label><select id="my_order_status" name="status" class="form-select"><option value="">Tất cả trạng thái</option>@foreach(\App\Models\Order::STATUSES as $status => $label)<option value="{{ $status }}" @selected(request('status') === $status)>{{ $label }}</option>@endforeach</select></div>
             <div class="col-md-2 d-grid"><button type="submit" class="btn btn-primary"><x-ui-icon name="search" :size="17"/> Tìm đơn</button></div>
             <div class="col-md-1"><a class="filter-reset" href="{{ route('orders.index') }}">Xóa lọc</a></div>

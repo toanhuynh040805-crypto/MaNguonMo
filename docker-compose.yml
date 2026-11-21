@@ -1,0 +1,74 @@
+x-app-environment: &app-environment
+  APP_NAME: OpenShop
+  APP_ENV: local
+  APP_DEBUG: "true"
+  APP_KEY: base64:b3BlbnNob3AtZG9ja2VyLWxvY2FsLWRldi1rZXkhISE=
+  APP_URL: http://127.0.0.1:8000
+  APP_LOCALE: vi
+  DB_CONNECTION: mysql
+  DB_HOST: db
+  DB_PORT: "3306"
+  DB_DATABASE: openshop_db
+  DB_USERNAME: openshop
+  DB_PASSWORD: openshop
+  SESSION_DRIVER: file
+  CACHE_STORE: file
+  # Order emails are queued and delivered by the "queue" service below.
+  QUEUE_CONNECTION: database
+  MAIL_MAILER: log
+  SEED_ADMIN_EMAIL: admin@example.test
+  SEED_ADMIN_PASSWORD: AdminOpenShop123
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html
+      # Keep vendor inside Docker: reading it through the Windows bind mount is very slow.
+      - openshop_vendor:/var/www/html/vendor
+    environment: *app-environment
+    healthcheck:
+      # /up must answer 200 (a PHP fatal error page would not contain "Application up").
+      test: ["CMD", "php", "-r", "exit(str_contains((string) @file_get_contents('http://127.0.0.1:8000/up'), 'Application up') ? 0 : 1);"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    depends_on:
+      - db
+
+  # Background worker for queued emails. Started after "app" has installed
+  # dependencies and run migrations. Restart it after changing PHP code:
+  #   docker compose restart queue
+  queue:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    entrypoint: ["php", "artisan", "queue:work", "--tries=3", "--sleep=2"]
+    volumes:
+      - .:/var/www/html
+      - openshop_vendor:/var/www/html/vendor
+    environment: *app-environment
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: openshop_db
+      MYSQL_USER: openshop
+      MYSQL_PASSWORD: openshop
+      MYSQL_ROOT_PASSWORD: root
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - openshop_mysql:/var/lib/mysql
+
+volumes:
+  openshop_mysql:
+  openshop_vendor:
