@@ -5,7 +5,12 @@
 <div class="d-flex justify-content-between flex-wrap gap-2 align-items-center mt-2 mb-4"><div><h1 class="section-title mb-0">Đơn hàng {{ $order->code }}</h1><div class="small text-muted">{{ $order->created_at->format('d/m/Y H:i') }}</div></div><div class="d-flex gap-2 align-items-center"><a class="btn btn-outline-primary btn-sm" href="{{ route('admin.orders.receipt', $order) }}" target="_blank" rel="noopener">🖨 In phiếu</a><x-order-badge :status="$order->status" /></div></div>
 <div class="row g-4"><div class="col-xl-7"><div class="panel p-4"><h2 class="h5 fw-bold">Sản phẩm trong đơn</h2>@foreach($order->items as $item)
 <div class="d-flex justify-content-between gap-3 border-bottom py-3"><div><strong>{{ $item->product_name }}</strong><div class="small text-muted">{{ number_format($item->price, 0, ',', '.') }}₫ × {{ $item->quantity }}</div></div><strong>{{ number_format($item->subtotal, 0, ',', '.') }}₫</strong></div>
-@endforeach<div class="d-flex justify-content-between mt-4 fw-bold h5"><span>Tổng tiền</span><span class="text-primary">{{ number_format($order->total_amount, 0, ',', '.') }}₫</span></div></div></div>
+@endforeach
+@if($order->discount_amount > 0)
+    <div class="d-flex justify-content-between mt-3 text-muted"><span>Tạm tính</span><span>{{ number_format($order->subtotal_amount, 0, ',', '.') }}₫</span></div>
+    <div class="d-flex justify-content-between text-success"><span>Mã giảm giá <strong>{{ $order->coupon_code }}</strong></span><span>−{{ number_format($order->discount_amount, 0, ',', '.') }}₫</span></div>
+@endif
+<div class="d-flex justify-content-between mt-4 fw-bold h5"><span>Tổng tiền</span><span class="text-primary">{{ number_format($order->total_amount, 0, ',', '.') }}₫</span></div></div></div>
 <div class="col-xl-5"><div class="panel p-4 mb-4"><h2 class="h5 fw-bold">Giao hàng</h2><p class="mb-1"><strong>{{ $order->recipient_name }}</strong> — {{ $order->phone }}</p><p>{{ $order->address }}</p><p class="text-muted small mb-0">Ghi chú: {{ $order->note ?: 'Không có' }}</p></div>
 <div class="panel p-4"><h2 class="h5 fw-bold mb-3">Cập nhật trạng thái</h2>
 @if(count(\App\Models\Order::TRANSITIONS[$order->status] ?? []) > 0)

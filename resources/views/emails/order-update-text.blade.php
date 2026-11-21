@@ -17,6 +17,10 @@ Sản phẩm:
 - {{ $item->product_name }} x {{ $item->quantity }}: {{ number_format($item->subtotal, 0, ',', '.') }} VND
 @endforeach
 
+@if($order->discount_amount > 0)
+Tạm tính: {{ number_format($order->subtotal_amount, 0, ',', '.') }} VND
+Mã giảm giá {{ $order->coupon_code }}: -{{ number_format($order->discount_amount, 0, ',', '.') }} VND
+@endif
 Tổng đơn: {{ number_format($order->total_amount, 0, ',', '.') }} VND
 
 Người nhận: {{ $order->recipient_name }}

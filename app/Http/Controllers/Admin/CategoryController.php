@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CategoryRequest;
 use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class CategoryController extends Controller
@@ -26,10 +25,9 @@ class CategoryController extends Controller
         return view('admin.categories.form', ['category' => new Category()]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(CategoryRequest $request): RedirectResponse
     {
-        $data = $this->validatedData($request);
-        Category::create($data);
+        Category::create($request->categoryData());
         return redirect()->route('admin.categories.index')->with('success', 'Đã thêm danh mục.');
     }
 
@@ -38,9 +36,9 @@ class CategoryController extends Controller
         return view('admin.categories.form', compact('category'));
     }
 
-    public function update(Request $request, Category $category): RedirectResponse
+    public function update(CategoryRequest $request, Category $category): RedirectResponse
     {
-        $category->update($this->validatedData($request, $category));
+        $category->update($request->categoryData());
         return redirect()->route('admin.categories.index')->with('success', 'Đã cập nhật danh mục.');
     }
 
@@ -51,19 +49,5 @@ class CategoryController extends Controller
         }
         $category->delete();
         return back()->with('success', 'Đã xóa danh mục.');
-    }
-
-    private function validatedData(Request $request, ?Category $category = null): array
-    {
-        $data = $request->validate([
-            'name' => ['required', 'string', 'max:150'],
-            'description' => ['nullable', 'string', 'max:1500'],
-        ]);
-        $data['slug'] = Str::slug($data['name']);
-        if ($data['slug'] === '' || Category::where('slug', $data['slug'])
-            ->when($category, fn ($q) => $q->whereKeyNot($category->id))->exists()) {
-            throw ValidationException::withMessages(['name' => 'Tên danh mục không hợp lệ hoặc đã tồn tại.']);
-        }
-        return $data;
     }
 }

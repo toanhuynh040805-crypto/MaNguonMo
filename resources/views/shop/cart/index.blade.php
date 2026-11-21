@@ -46,8 +46,27 @@
             <div class="col-lg-4">
                 <aside class="panel p-4 checkout-summary" aria-labelledby="cart-summary-heading">
                     <h2 id="cart-summary-heading" class="h5 fw-bold mb-3">Tóm tắt đơn hàng</h2>
-                    <div class="summary-row"><span>Tạm tính</span><strong>{{ number_format($total, 0, ',', '.') }}₫</strong></div>
+                    <div class="summary-row"><span>Tạm tính</span><strong>{{ number_format($subtotal, 0, ',', '.') }}₫</strong></div>
+                    @if($coupon)
+                        <div class="summary-row text-success"><span>Mã <strong class="font-monospace">{{ $coupon->code }}</strong></span><strong>−{{ number_format($discount, 0, ',', '.') }}₫</strong></div>
+                    @endif
                     <div class="summary-row"><span>Vận chuyển</span><span>Chưa tính trong demo</span></div>
+                    <div class="coupon-box">
+                        @if($couponError)<div class="small text-danger mb-2">{{ $couponError }}</div>@endif
+                        @if($coupon)
+                            <div class="coupon-applied">
+                                <span><x-ui-icon name="tag" :size="16"/> <strong class="font-monospace">{{ $coupon->code }}</strong><small class="d-block text-muted">{{ $coupon->summary }}</small></span>
+                                <form method="POST" action="{{ route('coupon.remove') }}">@csrf @method('DELETE')<button class="btn btn-link btn-sm text-danger p-0">Gỡ</button></form>
+                            </div>
+                        @else
+                            <form method="POST" action="{{ route('coupon.apply') }}" class="d-flex gap-2">
+                                @csrf
+                                <label class="visually-hidden" for="coupon-code">Mã giảm giá</label>
+                                <input id="coupon-code" name="coupon" class="form-control text-uppercase" maxlength="40" value="{{ old('coupon') }}" placeholder="Nhập mã giảm giá">
+                                <button class="btn btn-outline-primary text-nowrap">Áp dụng</button>
+                            </form>
+                        @endif
+                    </div>
                     <div class="summary-row summary-total"><span>Tổng cộng</span><strong>{{ number_format($total, 0, ',', '.') }}₫</strong></div>
                     <p class="text-muted small mb-3">Thanh toán khi nhận hàng (COD). Giá và tồn kho chỉ phục vụ đồ án.</p>
                     @if($canCheckout)

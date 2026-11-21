@@ -26,7 +26,14 @@
                 @foreach($items as $item)
                     <div class="order-line"><div><strong>{{ $item['product']->name }}</strong><small>Số lượng: {{ $item['quantity'] }}</small></div><strong class="text-nowrap">{{ number_format($item['subtotal'], 0, ',', '.') }}₫</strong></div>
                 @endforeach
-                <div class="summary-row summary-total mt-3"><span>Tổng thanh toán</span><strong>{{ number_format($total, 0, ',', '.') }}₫</strong></div>
+                @if($couponError)<div class="small text-danger mt-3">{{ $couponError }}</div>@endif
+                <div class="summary-row mt-3"><span>Tạm tính</span><strong>{{ number_format($subtotal, 0, ',', '.') }}₫</strong></div>
+                @if($coupon)
+                    <div class="summary-row text-success"><span>Mã <strong class="font-monospace">{{ $coupon->code }}</strong></span><strong>−{{ number_format($discount, 0, ',', '.') }}₫</strong></div>
+                @else
+                    <div class="small mb-2"><a href="{{ route('cart.index') }}"><x-ui-icon name="tag" :size="15"/> Có mã giảm giá? Nhập tại giỏ hàng</a></div>
+                @endif
+                <div class="summary-row summary-total"><span>Tổng thanh toán</span><strong>{{ number_format($total, 0, ',', '.') }}₫</strong></div>
                 <button type="submit" class="btn btn-primary btn-lg w-100 d-flex justify-content-center align-items-center gap-2 mt-3">Xác nhận đặt hàng <x-ui-icon name="arrow-right" :size="19"/></button>
                 <p class="text-muted small text-center mb-0 mt-3">Hệ thống sẽ kiểm tra lại tồn kho khi tạo đơn.</p>
             </aside>

@@ -4,6 +4,7 @@
 <a class="text-decoration-none small" href="{{ route('admin.categories.index') }}">← Quay lại</a><h1 class="section-title mt-2 mb-4">{{ $category->exists ? 'Sửa danh mục' : 'Thêm danh mục' }}</h1>
 <div class="panel p-4 p-lg-5"><form method="POST" action="{{ $category->exists ? route('admin.categories.update', $category) : route('admin.categories.store') }}">@csrf @if($category->exists) @method('PUT') @endif
     <div class="mb-3"><label class="form-label fw-semibold" for="name">Tên danh mục *</label><input id="name" name="name" class="form-control form-control-lg" value="{{ old('name', $category->name) }}" maxlength="150" required></div>
+    <div class="mb-3"><label class="form-label fw-semibold" for="slug">Đường dẫn (slug)</label><input id="slug" name="slug" class="form-control" maxlength="180" value="{{ old('slug', $category->slug) }}" placeholder="Để trống để tự tạo từ tên danh mục"><div class="form-text">Đổi tên danh mục không làm đổi đường dẫn. Menu đầu trang dùng đường dẫn của các danh mục chính.</div></div>
     <div class="mb-4"><label class="form-label fw-semibold" for="description">Mô tả</label><textarea id="description" name="description" class="form-control" rows="4" maxlength="1500">{{ old('description', $category->description) }}</textarea></div>
     <button class="btn btn-primary px-4">{{ $category->exists ? 'Lưu thay đổi' : 'Thêm danh mục' }}</button>
 </form></div>

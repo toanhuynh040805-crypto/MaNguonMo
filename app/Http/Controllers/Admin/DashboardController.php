@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\Review;
+use App\Models\User;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -41,6 +44,16 @@ class DashboardController extends Controller
             'outOfStockCount' => Product::where('stock', 0)->count(),
             'revenue' => Order::where('status', 'completed')->sum('total_amount'),
             'recentOrders' => Order::with('user')->latest()->limit(6)->get(),
+            // Best sellers from completed orders; product_name keeps history for deleted products.
+            'topProducts' => OrderItem::query()
+                ->join('orders', 'orders.id', '=', 'order_items.order_id')
+                ->where('orders.status', 'completed')
+                ->groupBy('order_items.product_id', 'order_items.product_name')
+                ->selectRaw('order_items.product_id, order_items.product_name, SUM(order_items.quantity) as sold, SUM(order_items.subtotal) as revenue')
+                ->orderByDesc('sold')->orderByDesc('revenue')
+                ->limit(5)->get(),
+            'reviewCount' => Review::count(),
+            'customerCount' => User::where('role', 'customer')->count(),
         ]);
     }
 }

@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use App\Models\Product;
-use App\Services\OrderEmailService;
+use App\Services\OrderService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -66,41 +64,18 @@ class OrderController extends Controller
         return view('orders.receipt', compact('order'));
     }
 
-    public function updateStatus(Request $request, Order $order): RedirectResponse
+    public function updateStatus(Request $request, Order $order, OrderService $orders): RedirectResponse
     {
-        $data = $request->validate(['status' => ['required', 'in:confirmed,shipping,completed,cancelled']]);
+        $data = $request->validate(['status' => ['required', Order::statusRule()]]);
 
-        $previousStatus = DB::transaction(function () use ($order, $data, $request): ?string {
-            $locked = Order::whereKey($order->id)->lockForUpdate()->firstOrFail();
-            if (! in_array($data['status'], Order::TRANSITIONS[$locked->status] ?? [], true)) {
-                return null;
-            }
-            $oldStatus = $locked->status;
-            $locked->update([
-                'status' => $data['status'],
-                'completed_at' => $data['status'] === 'completed' ? now() : $locked->completed_at,
-            ]);
-            $locked->statusHistories()->create([
-                'actor_id' => $request->user()->id,
-                'from_status' => $oldStatus,
-                'to_status' => $data['status'],
-            ]);
-            if ($data['status'] === 'cancelled') {
-                foreach ($locked->items as $item) {
-                    if ($item->product_id !== null) {
-                        Product::whereKey($item->product_id)->increment('stock', $item->quantity);
-                    }
-                }
-            }
-            return $oldStatus;
-        }, 3);
+        $previousStatus = $orders->transition($order, $data['status'], $request->user());
 
         if ($previousStatus === null) {
             return back()->with('error', 'Không thể chuyển sang trạng thái này.');
         }
 
         // Send after transaction commit only when a real status transition happened.
-        $emailAccepted = app(OrderEmailService::class)->send($order->fresh(), $previousStatus);
+        $emailAccepted = $orders->notify($order, $previousStatus, $request->user());
 
         return back()->with(
             'success',
@@ -114,7 +89,7 @@ class OrderController extends Controller
     {
         return $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
-            'status' => ['nullable', 'in:pending,confirmed,shipping,completed,cancelled'],
+            'status' => ['nullable', Order::statusRule()],
             'date_from' => ['nullable', 'date_format:Y-m-d'],
             'date_to' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_from'],
         ]);

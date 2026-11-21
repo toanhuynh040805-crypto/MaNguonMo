@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUniqueSlug;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
+    use HasUniqueSlug;
+
     protected $fillable = [
         'category_id', 'name', 'slug', 'description', 'price', 'stock', 'image_path', 'is_active',
     ];
@@ -26,6 +31,28 @@ class Product extends Model
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function reviews(): HasMany
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    public function wishlistedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
+    }
+
+    /** Products visible in the storefront. */
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('is_active', true);
+    }
+
+    /** Adds reviews_avg_rating and reviews_count for star displays. */
+    public function scopeWithRating(Builder $query): void
+    {
+        $query->withAvg('reviews', 'rating')->withCount('reviews');
     }
 
     public function getImageUrlAttribute(): ?string

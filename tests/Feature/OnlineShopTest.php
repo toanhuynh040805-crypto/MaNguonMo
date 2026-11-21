@@ -163,6 +163,7 @@ class OnlineShopTest extends TestCase
         $this->actingAs($customer)
             ->patch(route('profile.update'), [
                 'name' => 'Tên cập nhật', 'email' => 'profile@example.test', 'role' => 'admin',
+                'current_password' => 'password',
             ])->assertRedirect(route('profile.edit'));
 
         $this->assertDatabaseHas('users', [
@@ -208,10 +209,12 @@ class OnlineShopTest extends TestCase
         ])->assertRedirect(route('admin.categories.index'));
         $category = Category::where('slug', 'man-hinh')->firstOrFail();
 
+        // Renaming keeps the slug: the menu and links depend on it.
         $this->put(route('admin.categories.update', $category), [
             'name' => 'Màn hình lớn', 'description' => 'Mô tả mới',
         ])->assertRedirect(route('admin.categories.index'));
-        $this->assertSame('man-hinh-lon', $category->fresh()->slug);
+        $this->assertSame('man-hinh', $category->fresh()->slug);
+        $this->assertSame('Màn hình lớn', $category->fresh()->name);
 
         $this->delete(route('admin.categories.destroy', $category))->assertRedirect();
         $this->assertDatabaseMissing('categories', ['id' => $category->id]);
@@ -243,7 +246,7 @@ class OnlineShopTest extends TestCase
         ])->assertRedirect(route('admin.products.index'));
         $this->assertDatabaseHas('products', [
             'id' => $product->id, 'price' => 230000,
-            'stock' => 3, 'is_active' => 0, 'slug' => 'de-laptop-moi',
+            'stock' => 3, 'is_active' => 0, 'name' => 'Đế laptop mới', 'slug' => 'de-laptop',
         ]);
 
         $this->delete(route('admin.products.destroy', $product))->assertRedirect();
@@ -768,14 +771,14 @@ class OnlineShopTest extends TestCase
         ])->assertRedirect();
 
         $order = Order::firstOrFail();
-        Mail::assertSent(OrderUpdateMail::class, function (OrderUpdateMail $mail) use ($buyer, $order): bool {
+        Mail::assertQueued(OrderUpdateMail::class, function (OrderUpdateMail $mail) use ($buyer, $order): bool {
             return $mail->hasTo($buyer->email)
                 && $mail->previousStatus === null
                 && $mail->order->id === $order->id
                 && $mail->order->items->first()->quantity === 2
                 && str_contains($mail->envelope()->subject, $order->code);
         });
-        Mail::assertSentCount(1);
+        Mail::assertQueuedCount(1);
         $this->assertSame(2, $product->fresh()->stock);
     }
 
@@ -797,9 +800,9 @@ class OnlineShopTest extends TestCase
                 ->assertSessionHas('success');
         }
 
-        Mail::assertSentCount(3);
+        Mail::assertQueuedCount(3);
         foreach ([['pending', 'confirmed'], ['confirmed', 'shipping'], ['shipping', 'completed']] as [$from, $to]) {
-            Mail::assertSent(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
+            Mail::assertQueued(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
                 $mail->hasTo($customer->email)
                 && $mail->previousStatus === $from
                 && $mail->order->status === $to
@@ -821,18 +824,18 @@ class OnlineShopTest extends TestCase
         $this->actingAs(User::factory()->create(['role' => 'admin']));
         $this->patch(route('admin.orders.status', $order), ['status' => 'completed'])
             ->assertSessionHas('error');
-        Mail::assertNothingSent();
+        Mail::assertNothingOutgoing();
         $this->patch(route('admin.orders.status', $order), ['status' => 'cancelled'])
             ->assertSessionHas('success');
-        Mail::assertSentCount(1);
-        Mail::assertSent(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
+        Mail::assertQueuedCount(1);
+        Mail::assertQueued(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
             $mail->previousStatus === 'pending'
             && $mail->order->status === 'cancelled'
             && $mail->hasTo($customer->email)
         );
         $this->patch(route('admin.orders.status', $order), ['status' => 'cancelled'])
             ->assertSessionHas('error');
-        Mail::assertSentCount(1);
+        Mail::assertQueuedCount(1);
     }
 
     public function test_customer_cancellation_emails_only_once(): void
@@ -846,17 +849,17 @@ class OnlineShopTest extends TestCase
             'address' => 'Số 10',
         ])->assertRedirect();
         $order = Order::firstOrFail();
-        Mail::assertSentCount(1);
+        Mail::assertQueuedCount(1);
 
         $this->patch(route('orders.cancel', $order))->assertSessionHas('success');
-        Mail::assertSentCount(2);
-        Mail::assertSent(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
+        Mail::assertQueuedCount(2);
+        Mail::assertQueued(OrderUpdateMail::class, fn (OrderUpdateMail $mail) =>
             $mail->previousStatus === 'pending'
             && $mail->order->status === 'cancelled'
             && $mail->hasTo($customer->email)
         );
         $this->patch(route('orders.cancel', $order))->assertSessionHas('error');
-        Mail::assertSentCount(2);
+        Mail::assertQueuedCount(2);
         $this->assertSame(5, $product->fresh()->stock);
     }
 
@@ -890,7 +893,7 @@ class OnlineShopTest extends TestCase
             'total_amount' => 150000, 'status' => 'pending',
         ]);
         $this->assertFalse(app(\App\Services\OrderEmailService::class)->send($order));
-        Mail::assertNothingSent();
+        Mail::assertNothingOutgoing();
     }
 
     public function test_mail_test_command_requires_smtp_transport(): void

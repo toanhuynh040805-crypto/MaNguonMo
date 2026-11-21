@@ -3,12 +3,29 @@
 namespace App\Mail;
 
 use App\Models\Order;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-class OrderUpdateMail extends Mailable
+/**
+ * Queued so checkout and Admin actions never wait for SMTP.
+ *
+ * SerializesModels is intentionally NOT used: the whole order (with items) is
+ * serialized as a snapshot, so a worker running late still describes the status
+ * change that triggered this email rather than the order's latest status.
+ */
+class OrderUpdateMail extends Mailable implements ShouldQueue
 {
+    use Queueable;
+
+    /** Retry transient SMTP failures (Gmail throttling, timeouts). */
+    public int $tries = 3;
+
+    /** Seconds to wait before each retry. */
+    public array $backoff = [30, 120];
+
     public function __construct(
         public Order $order,
         public ?string $previousStatus = null,
